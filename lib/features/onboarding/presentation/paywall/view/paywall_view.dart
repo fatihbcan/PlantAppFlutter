@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hubx_flutter_case/core/assets/app_assets.dart';
 import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 import 'package:hubx_flutter_case/features/onboarding/domain/entity/subscription_plan.dart';
 import 'package:hubx_flutter_case/features/onboarding/presentation/paywall/bloc/paywall_bloc.dart';
@@ -107,55 +108,98 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final dimens = context.appDimens;
-    final double height = MediaQuery.sizeOf(context).height * 0.34;
 
-    return SizedBox(
-      height: height,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          DecoratedBox(
+    return Stack(
+      children: <Widget>[
+        // The photo keeps its own proportions and runs edge to edge under the
+        // status bar. The page scrolls, so a tall hero costs nothing.
+        AspectRatio(
+          aspectRatio: _heroAspectRatio,
+          child: Image.asset(
+            AppAssets.paywallHero,
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+          ),
+        ),
+        // The export already fades towards black; this carries that fade the
+        // rest of the way into the page colour so there is no visible seam.
+        Positioned.fill(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: <Color>[colors.premiumSurface, colors.premiumCanvas],
+                stops: const <double>[_fadeStart, 1],
+                colors: <Color>[
+                  colors.premiumCanvas.withValues(alpha: 0),
+                  colors.premiumCanvas,
+                ],
               ),
             ),
           ),
-          Center(
-            child: Icon(
-              Icons.local_florist_rounded,
-              size: height * 0.34,
-              color: colors.brand,
-            ),
+        ),
+        Positioned(
+          left: dimens.pageGutter,
+          right: dimens.pageGutter,
+          bottom: dimens.spaceXl,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              _PremiumTitle(l10n: l10n),
+              SizedBox(height: dimens.spaceXs),
+              Text(
+                l10n.paywallSubtitle,
+                style: context.appText.bodyMd.copyWith(
+                  color: colors.onPremiumMuted,
+                ),
+              ),
+            ],
           ),
-          Positioned(
-            left: dimens.pageGutter,
-            right: dimens.pageGutter,
-            bottom: dimens.spaceLg,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  l10n.paywallTitle,
-                  style: context.appText.displayMd.copyWith(
-                    color: colors.onPremium,
-                  ),
-                ),
-                SizedBox(height: dimens.spaceXs),
-                Text(
-                  l10n.paywallSubtitle,
-                  style: context.appText.bodyMd.copyWith(
-                    color: colors.onPremiumMuted,
-                  ),
-                ),
-              ],
-            ),
+        ),
+      ],
+    );
+  }
+
+  /// The export's proportions with its bottom quarter cropped off. That part
+  /// is the photo's fade to black and carries no subject, and dropping it is
+  /// what puts the title and the feature strip where the design has them.
+  static const double _heroAspectRatio = 393 / 384;
+
+  /// Where the fade into the page colour begins, down the hero.
+  static const double _fadeStart = 0.55;
+}
+
+/// "PlantApp Premium", with the product name carrying the weight.
+class _PremiumTitle extends StatelessWidget {
+  const _PremiumTitle({required this.l10n});
+
+  final AppL10n l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle base = context.appText.displayMd.copyWith(
+      color: context.appColors.onPremium,
+      fontWeight: FontWeight.w400,
+    );
+    final int split = l10n.paywallTitle.indexOf(l10n.appTitle);
+
+    if (split < 0) return Text(l10n.paywallTitle, style: base);
+
+    return Text.rich(
+      TextSpan(
+        style: base,
+        children: <InlineSpan>[
+          TextSpan(
+            text: l10n.appTitle,
+            style: base.copyWith(fontWeight: FontWeight.w800),
+          ),
+          TextSpan(
+            text: l10n.paywallTitle.substring(split + l10n.appTitle.length),
           ),
         ],
       ),
+      semanticsLabel: l10n.paywallTitle,
     );
   }
 }
