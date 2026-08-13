@@ -10,6 +10,13 @@ analyzer:
     - "**/*.gr.dart"
     - "**/*.config.dart"
     - "lib/l10n/gen/**"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   rules:

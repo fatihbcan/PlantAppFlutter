@@ -1,0 +1,130 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "PlantApp",
+  "@appTitle": {
+    "description": "Application name, shown as the task title."
+  },
+
+  "commonRetry": "Try again",
+  "commonContinue": "Continue",
+  "commonClose": "Close",
+  "commonErrorTitle": "Something went wrong",
+  "commonNetworkError": "You appear to be offline. Check your connection and try again.",
+  "commonServerError": "We couldn't reach the server. Please try again in a moment.",
+  "commonUnknownError": "An unexpected error occurred. Please try again.",
+  "commonEmptyTitle": "Nothing here yet",
+
+  "onboardingWelcomeTitle": "Welcome to {appName}",
+  "@onboardingWelcomeTitle": {
+    "description": "Headline of the first onboarding page.",
+    "placeholders": {
+      "appName": {
+        "type": "String",
+        "example": "PlantApp"
+      }
+    }
+  },
+  "onboardingWelcomeBody": "Identify more than 3000+ plants and 88% accuracy.",
+  "onboardingWelcomeCta": "Get Started",
+  "onboardingWelcomeLegal": "By tapping next, you are agreeing to PlantID Terms of Use & Privacy Policy.",
+
+  "onboardingIdentifyTitle": "Take a photo to identify the plant!",
+  "onboardingIdentifyHighlight": "Take a photo",
+  "onboardingIdentifyCta": "Continue",
+
+  "onboardingDiagnoseTitle": "Get plant care guides",
+  "onboardingDiagnoseHighlight": "care guides",
+  "onboardingDiagnoseCta": "Continue",
+
+  "onboardingPageIndicator": "Page {current} of {total}",
+  "@onboardingPageIndicator": {
+    "description": "Screen reader label for the onboarding page dots.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+
+  "paywallTitle": "PlantApp Premium",
+  "paywallSubtitle": "Access All Features",
+  "paywallFeatureUnlimitedTitle": "Unlimited",
+  "paywallFeatureUnlimitedBody": "Plant Identify",
+  "paywallFeatureFasterTitle": "Faster",
+  "paywallFeatureFasterBody": "Process",
+  "paywallFeatureDetailedTitle": "Detailed",
+  "paywallFeatureDetailedBody": "Plant care",
+  "paywallPlanMonthlyTitle": "1 Month",
+  "paywallPlanMonthlyBody": "{price}/month, auto renewable",
+  "@paywallPlanMonthlyBody": {
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$2.99"
+      }
+    }
+  },
+  "paywallPlanYearlyTitle": "1 Year",
+  "paywallPlanYearlyBody": "First 3 days free, then {price}/year",
+  "@paywallPlanYearlyBody": {
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$529.99"
+      }
+    }
+  },
+  "paywallPlanBadge": "Save 50%",
+  "paywallCta": "Try free for 3 days",
+  "paywallLegal": "After the 3-day free trial period you'll be charged {price} per year unless you cancel before the trial expires. Yearly Subscription is Auto-Renewable",
+  "@paywallLegal": {
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$274.99"
+      }
+    }
+  },
+  "paywallTerms": "Terms",
+  "paywallPrivacy": "Privacy",
+  "paywallRestore": "Restore",
+  "paywallCloseSemantics": "Close and continue to home",
+
+  "homeGreeting": "Hi, plant lover!",
+  "homeQuestion": "Good Afternoon! ⛅",
+  "homeSearchHint": "Search for plants",
+  "homeGetStartedTitle": "Get Started",
+  "homeCategoriesTitle": "Categories",
+  "homePremiumBannerTitle": "FREE Premium Available",
+  "homePremiumBannerBody": "Tap to upgrade your account!",
+  "homeQuestionsError": "We couldn't load the articles.",
+  "homeCategoriesError": "We couldn't load the categories.",
+  "homeSearchEmpty": "No plants match \"{query}\".",
+  "@homeSearchEmpty": {
+    "placeholders": {
+      "query": {
+        "type": "String",
+        "example": "fern"
+      }
+    }
+  },
+  "homeCategoryItemSemantics": "{title} category",
+  "@homeCategoryItemSemantics": {
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Ferns"
+      }
+    }
+  },
+
+  "navHome": "Home",
+  "navDiagnose": "Diagnose",
+  "navScan": "Scan",
+  "navMyGarden": "My Garden",
+  "navProfile": "Profile"
+}
