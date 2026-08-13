@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 import 'package:hubx_flutter_case/features/onboarding/presentation/intro/bloc/intro_bloc.dart';
+import 'package:hubx_flutter_case/features/onboarding/presentation/intro/widgets/intro_artwork.dart';
 import 'package:hubx_flutter_case/features/onboarding/presentation/intro/widgets/intro_headline.dart';
-import 'package:hubx_flutter_case/features/onboarding/presentation/intro/widgets/intro_hero.dart';
 import 'package:hubx_flutter_case/features/onboarding/presentation/intro/widgets/intro_page_dots.dart';
 import 'package:hubx_flutter_case/l10n/gen/app_localizations.dart';
 import 'package:hubx_flutter_case/shared/widgets/app_primary_button.dart';
@@ -61,7 +61,7 @@ class _IntroViewState extends State<IntroView> {
                 onPageChanged: (int index) =>
                     context.read<IntroBloc>().add(IntroEvent.pageSwiped(index)),
                 itemBuilder: (BuildContext context, int index) =>
-                    _IntroPageBody(content: pages[index], isFirst: index == 0),
+                    _IntroPageBody(content: pages[index]),
               ),
             ),
             Padding(
@@ -112,83 +112,74 @@ class _IntroViewState extends State<IntroView> {
     _IntroPageContent(
       title: l10n.onboardingWelcomeTitle(l10n.appTitle),
       highlight: l10n.appTitle,
+      underlinesHighlight: false,
       body: l10n.onboardingWelcomeBody,
       cta: l10n.onboardingWelcomeCta,
       legal: l10n.onboardingWelcomeLegal,
-      icon: Icons.eco_rounded,
+      artwork: IntroArtwork.welcome,
     ),
     _IntroPageContent(
       title: l10n.onboardingIdentifyTitle,
       highlight: l10n.onboardingIdentifyHighlight,
       cta: l10n.onboardingIdentifyCta,
-      icon: Icons.center_focus_strong_rounded,
+      artwork: IntroArtwork.identify,
     ),
     _IntroPageContent(
       title: l10n.onboardingDiagnoseTitle,
       highlight: l10n.onboardingDiagnoseHighlight,
       cta: l10n.onboardingDiagnoseCta,
-      icon: Icons.menu_book_rounded,
+      artwork: IntroArtwork.careGuides,
     ),
   ];
 }
 
-/// One intro page: artwork on top, copy underneath.
+/// One intro page: copy on top, artwork filling what is left below it.
+///
+/// The copy takes its natural height and the artwork absorbs the rest, which
+/// is what keeps the headline pinned near the top of a tall screen instead of
+/// floating down with the illustration.
 class _IntroPageBody extends StatelessWidget {
-  const _IntroPageBody({required this.content, required this.isFirst});
+  const _IntroPageBody({required this.content});
 
   final _IntroPageContent content;
-  final bool isFirst;
 
   @override
   Widget build(BuildContext context) {
     final dimens = context.appDimens;
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        // Copy keeps a fixed share of the page so the artwork absorbs the
-        // difference between a short and a tall device.
-        final int heroFlex = constraints.maxHeight > 640 ? 6 : 5;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Expanded(
-              flex: heroFlex,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isFirst ? 0 : dimens.pageGutter,
-                ),
-                child: IntroHero(icon: content.icon, isRounded: !isFirst),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            dimens.pageGutter,
+            dimens.spaceXl,
+            dimens.pageGutter,
+            0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              IntroHeadline(
+                text: content.title,
+                highlight: content.highlight,
+                isHighlightUnderlined: content.underlinesHighlight,
               ),
-            ),
-            Expanded(
-              flex: 4,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: dimens.pageGutter),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(height: dimens.spaceXl),
-                    IntroHeadline(
-                      text: content.title,
-                      highlight: content.highlight,
-                    ),
-                    if (content.body != null) ...<Widget>[
-                      SizedBox(height: dimens.spaceMd),
-                      Text(
-                        content.body!,
-                        style: context.appText.bodyMd.copyWith(
-                          color: context.appColors.onCanvasMuted,
-                        ),
-                      ),
-                    ],
-                  ],
+              if (content.body != null) ...<Widget>[
+                SizedBox(height: dimens.spaceMd),
+                Text(
+                  content.body!,
+                  style: context.appText.bodyMd.copyWith(
+                    color: context.appColors.onCanvasMuted,
+                  ),
                 ),
-              ),
-            ),
-          ],
-        );
-      },
+              ],
+            ],
+          ),
+        ),
+        SizedBox(height: dimens.spaceLg),
+        Expanded(child: IntroArtworkView(artwork: content.artwork)),
+      ],
     );
   }
 }
@@ -199,16 +190,21 @@ class _IntroPageContent {
   const _IntroPageContent({
     required this.title,
     required this.cta,
-    required this.icon,
+    required this.artwork,
     this.highlight,
+    this.underlinesHighlight = true,
     this.body,
     this.legal,
   });
 
   final String title;
   final String cta;
-  final IconData icon;
+  final IntroArtwork artwork;
   final String? highlight;
+
+  /// The welcome page emphasises the product name with weight only; the two
+  /// onboarding pages draw the stroke as well.
+  final bool underlinesHighlight;
   final String? body;
   final String? legal;
 }

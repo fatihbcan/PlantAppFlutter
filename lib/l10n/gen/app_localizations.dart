@@ -180,7 +180,7 @@ abstract class AppL10n {
   /// No description provided for @onboardingIdentifyHighlight.
   ///
   /// In en, this message translates to:
-  /// **'Take a photo'**
+  /// **'identify'**
   String get onboardingIdentifyHighlight;
 
   /// No description provided for @onboardingIdentifyCta.
