@@ -87,7 +87,7 @@ void main() {
     });
 
     test('humanPageNumber is 1-based for the screen reader', () {
-      expect(const IntroState(pageIndex: 0).humanPageNumber, 1);
+      expect(const IntroState().humanPageNumber, 1);
       expect(const IntroState(pageIndex: 2).humanPageNumber, 3);
     });
   });
