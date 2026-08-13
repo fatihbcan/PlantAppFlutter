@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hubx_flutter_case/core/network/api_config.dart';
 import 'package:hubx_flutter_case/core/network/error_interceptor.dart';
+import 'package:hubx_flutter_case/core/network/json_decode_interceptor.dart';
 import 'package:injectable/injectable.dart';
 
 /// Provides the single configured [Dio] instance to the graph.
@@ -22,6 +23,9 @@ abstract class NetworkModule {
       ),
     );
 
+    // Order matters: decode first, then let the error interceptor translate
+    // whatever went wrong, including a decode failure.
+    dio.interceptors.add(const JsonDecodeInterceptor());
     dio.interceptors.add(const ErrorInterceptor());
 
     if (kDebugMode) {
