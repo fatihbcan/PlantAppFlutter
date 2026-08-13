@@ -5,8 +5,8 @@ import 'package:hubx_flutter_case/features/home/domain/entity/category.dart';
 import 'package:hubx_flutter_case/features/home/domain/entity/question.dart';
 import 'package:hubx_flutter_case/features/home/presentation/bloc/home_bloc.dart';
 import 'package:hubx_flutter_case/features/home/presentation/widgets/category_tile.dart';
+import 'package:hubx_flutter_case/features/home/presentation/widgets/home_header.dart';
 import 'package:hubx_flutter_case/features/home/presentation/widgets/home_premium_banner.dart';
-import 'package:hubx_flutter_case/features/home/presentation/widgets/home_search_field.dart';
 import 'package:hubx_flutter_case/features/home/presentation/widgets/question_card.dart';
 import 'package:hubx_flutter_case/l10n/gen/app_localizations.dart';
 import 'package:hubx_flutter_case/shared/widgets/app_error_view.dart';
@@ -35,15 +35,7 @@ class HomeView extends StatelessWidget {
             // load leaves the page shorter than the viewport.
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: <Widget>[
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  dimens.pageGutter,
-                  dimens.spaceLg,
-                  dimens.pageGutter,
-                  dimens.spaceLg,
-                ),
-                sliver: SliverToBoxAdapter(child: _Header(l10n: l10n)),
-              ),
+              SliverToBoxAdapter(child: _Header(l10n: l10n)),
               if (state.showsQuestions)
                 SliverToBoxAdapter(child: _QuestionsSection(state: state)),
               if (state.showsQuestionsError)
@@ -84,33 +76,25 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          l10n.homeGreeting,
-          style: context.appText.titleLg.copyWith(
-            color: context.appColors.onCanvas,
-          ),
-        ),
-        SizedBox(height: dimens.spaceXxs),
-        Text(
-          l10n.homeQuestion,
-          style: context.appText.bodyMd.copyWith(
-            color: context.appColors.onCanvasMuted,
-          ),
-        ),
-        SizedBox(height: dimens.spaceLg),
-        HomeSearchField(
-          hintText: l10n.homeSearchHint,
-          onChanged: (String query) =>
+        HomeHeader(
+          greeting: l10n.homeGreeting,
+          salutation: l10n.homeQuestion,
+          searchHint: l10n.homeSearchHint,
+          onSearchChanged: (String query) =>
               context.read<HomeBloc>().add(HomeEvent.searchChanged(query)),
-          onCleared: () =>
+          onSearchCleared: () =>
               context.read<HomeBloc>().add(const HomeEvent.searchCleared()),
         ),
         SizedBox(height: dimens.spaceLg),
-        HomePremiumBanner(
-          title: l10n.homePremiumBannerTitle,
-          body: l10n.homePremiumBannerBody,
-          onTap: () {},
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: dimens.pageGutter),
+          child: HomePremiumBanner(
+            title: l10n.homePremiumBannerTitle,
+            body: l10n.homePremiumBannerBody,
+            onTap: () {},
+          ),
         ),
+        SizedBox(height: dimens.spaceLg),
       ],
     );
   }
@@ -124,7 +108,6 @@ class _QuestionsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dimens = context.appDimens;
-    final AppL10n l10n = AppL10n.of(context);
     // Cards show a sliver of the next one, which signals horizontal scroll
     // without needing an affordance.
     final double cardWidth = MediaQuery.sizeOf(context).width * 0.62;
@@ -132,16 +115,6 @@ class _QuestionsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: dimens.pageGutter),
-          child: Text(
-            l10n.homeGetStartedTitle,
-            style: context.appText.titleMd.copyWith(
-              color: context.appColors.onCanvas,
-            ),
-          ),
-        ),
-        SizedBox(height: dimens.spaceMd),
         SizedBox(
           height: cardWidth * 0.82,
           child: ListView.separated(

@@ -31,7 +31,9 @@ class CategoryTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(dimens.radiusMd),
         child: Container(
           decoration: BoxDecoration(
-            color: colors.surface,
+            // The design tints these cells rather than leaving them the
+            // page's white, which is what separates the grid from the canvas.
+            color: colors.surfaceMuted,
             borderRadius: BorderRadius.circular(dimens.radiusMd),
             border: Border.all(color: colors.outline),
           ),

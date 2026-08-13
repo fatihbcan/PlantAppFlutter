@@ -345,18 +345,6 @@ abstract class AppL10n {
   /// **'Search for plants'**
   String get homeSearchHint;
 
-  /// No description provided for @homeGetStartedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Get Started'**
-  String get homeGetStartedTitle;
-
-  /// No description provided for @homeCategoriesTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Categories'**
-  String get homeCategoriesTitle;
-
   /// No description provided for @homePremiumBannerTitle.
   ///
   /// In en, this message translates to:
