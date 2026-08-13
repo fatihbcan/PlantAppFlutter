@@ -1,17 +1,132 @@
-# hubx_flutter_case
+# PlantApp — HUBX Flutter Case
 
-A new Flutter project.
+A Flutter implementation of the HUBX developer case: an **onboarding flow**
+that ends at a paywall, and a **home flow** driven by two live endpoints.
+Bloc for state, Clean Architecture per feature, `dio` + `freezed` +
+`json_serializable` for the network layer, `auto_route` for navigation and
+`get_it`/`injectable` for the object graph.
 
-## Getting Started
+## Running it
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+dart run build_runner build
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+Codegen (`freezed`, `json_serializable`, `injectable`, `auto_route`) must run
+before the first build, and again after any change to an annotated class.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+flutter analyze                # zero issues expected
+dart format --set-exit-if-changed lib test
+flutter test                   # 113 tests
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## What the app does
+
+**Onboarding** — three intro pages, then the paywall. Tapping the paywall's
+close button is what ends onboarding, per the brief: the completion flag is
+persisted and the router replaces the stack with home. A user who completes
+the flow never sees it again, on this launch or any later one.
+
+**Home** — greeting, search, premium banner, a horizontal "Get Started"
+carousel from `getQuestions`, and a categories grid from `getCategories`.
+Pull to refresh; search filters the grid live.
+
+## Layout
+
+```
+lib/
+  app/            composition root — router, guards, DI, root widget
+  core/           theme, network, storage, l10n — no feature knowledge
+  shared/widgets/ reusable widgets, primitives-only APIs
+  features/
+    onboarding/   domain / data / presentation — intro AND paywall
+    home/         domain / data / presentation
+test/             mirrors lib/
+```
+
+`domain/` is pure Dart with no Flutter import. `presentation/` depends on
+`domain/` and never on `data/`. Features never import each other; anything
+cross-cutting is wired in `app/`.
+
+## Deliberate trade-offs
+
+These are the places where the project diverges from the most common Flutter
+idiom. Each was a choice, not an oversight.
+
+**Per-operation sealed result unions, not `Either<Failure, T>`.** Each
+operation defines its own union — `GetCategoriesResult` has `success`,
+`network`, `server(statusCode)`, `parse` and `unknown`. Callers consume it
+with an exhaustive `switch` and no `default:`, so adding a failure mode later
+is a compile error at every call site rather than a silent fall-through. A
+generic `Either` is more reusable but pushes error semantics into a `Failure`
+hierarchy that every caller has to re-interpret; `dartz`/`fpdart` would also
+add a functional vocabulary the rest of the codebase does not use.
+
+**Flat state fields, not a `Loading | Success | Error` union.** `HomeState`
+carries `isLoading`, `questions`, `categories` and two nullable failure
+fields at once. A sealed UI-state union cannot express "showing cached
+categories while refreshing, with the articles endpoint down" — which is
+exactly what home does. Derived questions (`visibleCategories`,
+`showsQuestionsError`) are getters on the state, so they are unit-tested
+without pumping a widget tree.
+
+**Two failure fields, not one.** The two home endpoints fail independently. A
+dead `getCategories` still leaves the articles carousel usable, and each
+section offers its own retry.
+
+**Every I/O event declares a concurrency transformer.** Bloc processes events
+concurrently by default, so a mashed retry button fans out into N requests.
+Refresh and submit are `droppable()`, search is `restartable()` behind a
+debounce, page changes are `sequential()`. The tests that cover this
+deliberately use slow stubs — an instantly-completing mock never overlaps
+with anything, so `droppable` would have nothing to drop and the test would
+pass for the wrong reason.
+
+**A JSON-decoding interceptor.** Both endpoints return JSON under
+`content-type: text/plain`, so Dio leaves the body as a raw `String`.
+`JsonDecodeInterceptor` decodes it before anything else sees it, keeping the
+server's quirk in one file instead of in every data source.
+
+**Failing open on persistence.** If the onboarding flag cannot be read, the
+guard shows onboarding; if it cannot be written, the paywall still lets the
+user through and surfaces a snackbar. Repeating onboarding is a milder
+failure than locking someone out of the app.
+
+**The paywall lives inside `features/onboarding/`, not beside it.** It is a
+page in the onboarding flow — it completes onboarding and needs its use
+cases. Making it a sibling feature would force one feature to import
+another's domain, which is the signal that the boundary was drawn at a screen
+instead of at a functional requirement.
+
+**No hardcoded colours, spacing or strings.** Colours, spacing and text
+styles come from three `ThemeExtension`s (`AppColors`, `AppDimens`,
+`AppTypography`) reached through `context.appColors` / `.appDimens` /
+`.appText`; user-facing text comes from generated localisations. `AppDimens`
+switches to a tighter scale below a 700dp viewport so onboarding still fits
+on a small phone.
+
+## Known gaps
+
+**Artwork.** The Figma file is access-controlled, so the onboarding and
+paywall illustrations are rendered as themed gradient heroes with Material
+icons rather than exported assets. Layout, type scale, spacing and colour are
+built to the design's structure; dropping real exports into `assets/` and
+pointing the hero widgets at them is a contained change. Home is unaffected —
+its imagery comes from the API.
+
+**Fonts.** The app uses the platform default (SF Pro on iOS, Roboto on
+Android) rather than bundling the design's typeface.
+
+**Tab bar.** The home design shows a five-item bottom navigation bar. Only
+the Home destination has a screen in this case, so it is not implemented
+rather than shipped as four dead tabs.
+
+## Testing
+
+113 tests: DTO→entity mappers (null collapsing, rank/order sorting),
+repository impls (one test per result branch), use cases, `bloc_test` suites
+for `HomeBloc`, `PaywallBloc` and `IntroBloc` including concurrency
+behaviour, State getters, and the two interceptors' translation rules.
