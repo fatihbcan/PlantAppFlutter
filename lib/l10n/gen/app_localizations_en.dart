@@ -151,12 +151,6 @@ class AppL10nEn extends AppL10n {
   String get homeSearchHint => 'Search for plants';
 
   @override
-  String get homeGetStartedTitle => 'Get Started';
-
-  @override
-  String get homeCategoriesTitle => 'Categories';
-
-  @override
   String get homePremiumBannerTitle => 'FREE Premium Available';
 
   @override

@@ -5,6 +5,7 @@ import 'package:hubx_flutter_case/app/di/injection.dart';
 import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 import 'package:hubx_flutter_case/features/home/presentation/bloc/home_bloc.dart';
 import 'package:hubx_flutter_case/features/home/presentation/view/home_view.dart';
+import 'package:hubx_flutter_case/features/home/presentation/widgets/home_bottom_bar.dart';
 
 /// Route entry for home: provides the Bloc and kicks off the first load.
 @RoutePage()
@@ -18,6 +19,9 @@ class HomePage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: context.appColors.canvas,
         body: const SafeArea(bottom: false, child: HomeView()),
+        // Only Home has a screen in this case; the scan control is the one
+        // live affordance in the bar.
+        bottomNavigationBar: HomeBottomBar(onScanPressed: () {}),
       ),
     );
   }
