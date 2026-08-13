@@ -30,16 +30,18 @@ close button is what ends onboarding, per the brief: the completion flag is
 persisted and the router replaces the stack with home. A user who completes
 the flow never sees it again, on this launch or any later one.
 
-**Home** — greeting, search, premium banner, a horizontal "Get Started"
-carousel from `getQuestions`, and a categories grid from `getCategories`.
-Pull to refresh; search filters the grid live.
+**Home** — a tinted header band carrying the greeting and search, a premium
+banner, a horizontal carousel from `getQuestions`, a categories grid from
+`getCategories`, and the design's bottom bar. Pull to refresh; search filters
+the grid live.
 
 ## Layout
 
 ```
+assets/images/    artwork exported from the design
 lib/
   app/            composition root — router, guards, DI, root widget
-  core/           theme, network, storage, l10n — no feature knowledge
+  core/           theme, network, storage, l10n, asset paths
   shared/widgets/ reusable widgets, primitives-only APIs
   features/
     onboarding/   domain / data / presentation — intro AND paywall
@@ -104,25 +106,42 @@ instead of at a functional requirement.
 **No hardcoded colours, spacing or strings.** Colours, spacing and text
 styles come from three `ThemeExtension`s (`AppColors`, `AppDimens`,
 `AppTypography`) reached through `context.appColors` / `.appDimens` /
-`.appText`; user-facing text comes from generated localisations. `AppDimens`
-switches to a tighter scale below a 700dp viewport so onboarding still fits
-on a small phone.
+`.appText`; user-facing text comes from generated localisations; image paths
+come from `AppAssets`. `AppDimens` switches to a tighter scale below a 700dp
+viewport so onboarding still fits on a small phone.
+
+**Artwork composed in fractions, not fixed offsets.** The pieces that make up
+an illustration — the welcome badges, the phone mockups, the header plant —
+are placed and sized as fractions of the box they are given, and clipped
+where the design cuts them off. A design measured at 360×800 then holds its
+proportions on a 402pt phone or a tablet instead of drifting apart.
+
+## Artwork
+
+The illustrations in `assets/images/` are exported from the case's Figma
+file, which reads without an account. Paths live in `AppAssets` so no widget
+holds a string literal. Figma serves these capped at about 512px on the
+longest edge — enough for 1x and 2x at the sizes they are drawn, slightly
+soft for the largest of them on a 3x screen.
+
+Two pieces are drawn rather than exported. The three care badges on the
+welcome screen are violet, amber and azure in the frames but green in the
+export, so they are built from `AppColors` and a Material icon, which also
+keeps them crisp at any density. The paywall's feature icons are Material
+icons for the same reason.
 
 ## Known gaps
-
-**Artwork.** The Figma file is access-controlled, so the onboarding and
-paywall illustrations are rendered as themed gradient heroes with Material
-icons rather than exported assets. Layout, type scale, spacing and colour are
-built to the design's structure; dropping real exports into `assets/` and
-pointing the hero widgets at them is a contained change. Home is unaffected —
-its imagery comes from the API.
 
 **Fonts.** The app uses the platform default (SF Pro on iOS, Roboto on
 Android) rather than bundling the design's typeface.
 
-**Tab bar.** The home design shows a five-item bottom navigation bar. Only
-the Home destination has a screen in this case, so it is not implemented
-rather than shipped as four dead tabs.
+**Tab bar.** The home design's five destinations are all present, but only
+Home has a screen in this case. The other four render and are marked
+disabled for a screen reader rather than posing as buttons that silently do
+nothing; the raised scan control is the bar's one live affordance.
+
+**Widget tests.** The suite is unit and Bloc level. The case lists widget
+tests under its bonus criteria and there are none yet.
 
 ## Testing
 
