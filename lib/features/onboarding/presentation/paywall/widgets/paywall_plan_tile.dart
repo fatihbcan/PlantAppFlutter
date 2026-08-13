@@ -35,46 +35,53 @@ class PaywallPlanTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(dimens.radiusLg),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOut,
-          padding: EdgeInsets.all(dimens.spaceLg),
-          decoration: BoxDecoration(
-            color: colors.premiumSurface,
-            borderRadius: BorderRadius.circular(dimens.radiusLg),
-            border: Border.all(
-              color: isSelected ? colors.brand : colors.premiumOutline,
-              width: isSelected ? dimens.strokeThick : dimens.strokeThin,
-            ),
-          ),
-          child: Row(
-            children: <Widget>[
-              _SelectionDot(isSelected: isSelected),
-              SizedBox(width: dimens.spaceMd),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      title,
-                      style: context.appText.titleSm.copyWith(
-                        color: colors.onPremium,
-                      ),
-                    ),
-                    SizedBox(height: dimens.spaceXxs),
-                    Text(
-                      subtitle,
-                      style: context.appText.bodySm.copyWith(
-                        color: colors.onPremiumMuted,
-                      ),
-                    ),
-                  ],
+        child: Stack(
+          children: <Widget>[
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              padding: EdgeInsets.all(dimens.spaceLg),
+              decoration: BoxDecoration(
+                color: colors.premiumSurface,
+                borderRadius: BorderRadius.circular(dimens.radiusLg),
+                border: Border.all(
+                  color: isSelected ? colors.brand : colors.premiumOutline,
+                  width: isSelected ? dimens.strokeThick : dimens.strokeThin,
                 ),
               ),
-              if (badge != null) _PlanBadge(label: badge!),
-            ],
-          ),
+              child: Row(
+                children: <Widget>[
+                  _SelectionDot(isSelected: isSelected),
+                  SizedBox(width: dimens.spaceMd),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(
+                          title,
+                          style: context.appText.titleSm.copyWith(
+                            color: colors.onPremium,
+                          ),
+                        ),
+                        SizedBox(height: dimens.spaceXxs),
+                        Text(
+                          subtitle,
+                          style: context.appText.bodySm.copyWith(
+                            color: colors.onPremiumMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // The design hangs the badge off the tile's top-right corner
+            // rather than setting it in the row beside the copy.
+            if (badge != null)
+              Positioned(top: 0, right: 0, child: _PlanBadge(label: badge!)),
+          ],
         ),
       ),
     );
@@ -133,12 +140,16 @@ class _PlanBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: context.appColors.brand,
-        borderRadius: BorderRadius.circular(dimens.radiusSm),
+        // Square where it meets the tile's edges, rounded where it does not.
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(dimens.radiusLg),
+          bottomLeft: Radius.circular(dimens.radiusLg),
+        ),
       ),
       child: Text(
         label,
         style: context.appText.caption.copyWith(
-          color: Colors.white,
+          color: context.appColors.onPremium,
           fontWeight: FontWeight.w600,
         ),
       ),
