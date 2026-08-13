@@ -25,6 +25,9 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.onPremiumMuted,
     required this.danger,
     required this.scrim,
+    required this.accentViolet,
+    required this.accentAmber,
+    required this.accentAzure,
   });
 
   /// Primary green used for CTAs, selection and progress.
@@ -81,6 +84,13 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Overlay behind images so foreground text stays legible.
   final Color scrim;
 
+  /// The three decorative care badges on the welcome artwork. They are
+  /// deliberately outside the green brand ramp — in the design they read as
+  /// stickers on top of the photo, not as app chrome.
+  final Color accentViolet;
+  final Color accentAmber;
+  final Color accentAzure;
+
   static const AppColors light = AppColors(
     brand: Color(0xFF28AF6E),
     brandMuted: Color(0xFFE9F7F0),
@@ -100,6 +110,9 @@ class AppColors extends ThemeExtension<AppColors> {
     onPremiumMuted: Color(0xFFB3BDB7),
     danger: Color(0xFFD1453B),
     scrim: Color(0x66000000),
+    accentViolet: Color(0xFF9B51E0),
+    accentAmber: Color(0xFFF2994A),
+    accentAzure: Color(0xFF2D9CDB),
   );
 
   static const AppColors dark = AppColors(
@@ -121,6 +134,9 @@ class AppColors extends ThemeExtension<AppColors> {
     onPremiumMuted: Color(0xFFB3BDB7),
     danger: Color(0xFFF07167),
     scrim: Color(0x80000000),
+    accentViolet: Color(0xFFA470E8),
+    accentAmber: Color(0xFFF4A868),
+    accentAzure: Color(0xFF56B0E3),
   );
 
   @override
@@ -143,6 +159,9 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? onPremiumMuted,
     Color? danger,
     Color? scrim,
+    Color? accentViolet,
+    Color? accentAmber,
+    Color? accentAzure,
   }) {
     return AppColors(
       brand: brand ?? this.brand,
@@ -163,6 +182,9 @@ class AppColors extends ThemeExtension<AppColors> {
       onPremiumMuted: onPremiumMuted ?? this.onPremiumMuted,
       danger: danger ?? this.danger,
       scrim: scrim ?? this.scrim,
+      accentViolet: accentViolet ?? this.accentViolet,
+      accentAmber: accentAmber ?? this.accentAmber,
+      accentAzure: accentAzure ?? this.accentAzure,
     );
   }
 
@@ -188,6 +210,9 @@ class AppColors extends ThemeExtension<AppColors> {
       onPremiumMuted: Color.lerp(onPremiumMuted, other.onPremiumMuted, t)!,
       danger: Color.lerp(danger, other.danger, t)!,
       scrim: Color.lerp(scrim, other.scrim, t)!,
+      accentViolet: Color.lerp(accentViolet, other.accentViolet, t)!,
+      accentAmber: Color.lerp(accentAmber, other.accentAmber, t)!,
+      accentAzure: Color.lerp(accentAzure, other.accentAzure, t)!,
     );
   }
 }

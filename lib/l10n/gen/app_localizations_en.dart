@@ -59,7 +59,7 @@ class AppL10nEn extends AppL10n {
   String get onboardingIdentifyTitle => 'Take a photo to identify the plant!';
 
   @override
-  String get onboardingIdentifyHighlight => 'Take a photo';
+  String get onboardingIdentifyHighlight => 'identify';
 
   @override
   String get onboardingIdentifyCta => 'Continue';

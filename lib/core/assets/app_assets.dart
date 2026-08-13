@@ -13,11 +13,6 @@ abstract final class AppAssets {
   /// Potted monstera on the welcome screen.
   static const String welcomePlant = '$_images/onboarding_welcome_plant.png';
 
-  /// The three care badges that float around the welcome plant.
-  static const String badgeWater = '$_images/badge_water.png';
-  static const String badgeSun = '$_images/badge_sun.png';
-  static const String badgeSpray = '$_images/badge_spray.png';
-
   /// Phone mockup framing the camera, on the "identify" page.
   static const String identifyPhone = '$_images/onboarding_identify_phone.png';
 
