@@ -56,6 +56,12 @@ class AppL10nEn extends AppL10n {
       'By tapping next, you are agreeing to PlantID Terms of Use & Privacy Policy.';
 
   @override
+  String get onboardingTermsOfUse => 'Terms of Use';
+
+  @override
+  String get onboardingPrivacyPolicy => 'Privacy Policy';
+
+  @override
   String get onboardingIdentifyTitle => 'Take a photo to identify the plant!';
 
   @override

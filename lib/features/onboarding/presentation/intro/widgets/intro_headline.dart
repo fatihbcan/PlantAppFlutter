@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hubx_flutter_case/core/assets/app_assets.dart';
+import 'package:hubx_flutter_case/core/theme/app_typography.dart';
 import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 
 /// Intro headline with one emphasised phrase, as in the design.
@@ -44,7 +45,9 @@ class IntroHeadline extends StatelessWidget {
     }
 
     final int end = start + highlight!.length;
-    final TextStyle emphasised = base.copyWith(fontWeight: FontWeight.w800);
+    final TextStyle emphasised = base.copyWith(
+      fontWeight: AppTypography.emphasis,
+    );
     final String phrase = text.substring(start, end);
 
     return Text.rich(
@@ -82,14 +85,16 @@ class _UnderlinedPhrase extends StatelessWidget {
     final double fontSize = style.fontSize ?? 0;
 
     // The stroke hangs below the baseline without adding to the line box, so
-    // the headline's leading is unchanged whether a phrase is emphasised.
+    // the headline's leading is unchanged whether a phrase is emphasised. In
+    // the design it also runs on past the phrase to the right, which is what
+    // makes it read as drawn by hand rather than as an underline.
     return Stack(
       clipBehavior: Clip.none,
       children: <Widget>[
         Text(text, style: style),
         Positioned(
           left: 0,
-          right: 0,
+          right: -fontSize * _strokeOvershootFactor,
           bottom: -fontSize * _strokeDropFactor,
           child: Image.asset(
             AppAssets.headlineUnderline,
@@ -103,6 +108,7 @@ class _UnderlinedPhrase extends StatelessWidget {
     );
   }
 
-  static const double _strokeHeightFactor = 0.28;
-  static const double _strokeDropFactor = 0.08;
+  static const double _strokeHeightFactor = 0.95;
+  static const double _strokeDropFactor = 0.52;
+  static const double _strokeOvershootFactor = 1.6;
 }

@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 ///
 /// Sizes carry no colour: colour comes from [AppColors] at the call site, so
 /// the same style works on light, dark and premium surfaces.
+///
+/// Every style names the family explicitly. These styles are handed to
+/// widgets directly through `context.appText`, so they cannot rely on the
+/// [ThemeData] default to supply it.
 @immutable
 class AppTypography extends ThemeExtension<AppTypography> {
   const AppTypography({
@@ -19,6 +23,9 @@ class AppTypography extends ThemeExtension<AppTypography> {
     required this.caption,
     required this.button,
   });
+
+  /// The design's typeface, bundled under `assets/fonts`.
+  static const String fontFamily = 'Rubik';
 
   /// Onboarding headline.
   final TextStyle displayLg;
@@ -47,32 +54,83 @@ class AppTypography extends ThemeExtension<AppTypography> {
 
   final TextStyle button;
 
+  /// The weight the design uses for the emphasised half of a headline.
+  static const FontWeight emphasis = FontWeight.w800;
+
   static const AppTypography regular = AppTypography(
     displayLg: TextStyle(
-      fontSize: 28,
-      height: 1.2,
-      fontWeight: FontWeight.w300,
-      letterSpacing: -0.5,
+      fontFamily: fontFamily,
+      fontSize: 27,
+      height: 1.28,
+      fontWeight: FontWeight.w400,
+      letterSpacing: -0.8,
     ),
     displayMd: TextStyle(
+      fontFamily: fontFamily,
       fontSize: 27,
       height: 1.2,
-      fontWeight: FontWeight.w800,
-      letterSpacing: -0.5,
+      fontWeight: FontWeight.w400,
+      letterSpacing: -0.6,
     ),
-    titleLg: TextStyle(fontSize: 24, height: 1.25, fontWeight: FontWeight.w600),
-    titleMd: TextStyle(fontSize: 16, height: 1.3, fontWeight: FontWeight.w600),
-    titleSm: TextStyle(fontSize: 14, height: 1.3, fontWeight: FontWeight.w600),
-    bodyLg: TextStyle(fontSize: 16, height: 1.4, fontWeight: FontWeight.w400),
-    bodyMd: TextStyle(fontSize: 14, height: 1.4, fontWeight: FontWeight.w400),
-    bodySm: TextStyle(fontSize: 12, height: 1.35, fontWeight: FontWeight.w400),
-    label: TextStyle(fontSize: 13, height: 1.3, fontWeight: FontWeight.w500),
-    caption: TextStyle(fontSize: 10, height: 1.3, fontWeight: FontWeight.w400),
-    button: TextStyle(
-      fontSize: 15,
+    titleLg: TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 24,
       height: 1.2,
       fontWeight: FontWeight.w600,
-      letterSpacing: 0.2,
+      letterSpacing: -0.9,
+    ),
+    titleMd: TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 16,
+      height: 1.3,
+      fontWeight: FontWeight.w500,
+      letterSpacing: -0.2,
+    ),
+    titleSm: TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 15,
+      height: 1.3,
+      fontWeight: FontWeight.w500,
+      letterSpacing: -0.2,
+    ),
+    bodyLg: TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 16,
+      height: 1.4,
+      fontWeight: FontWeight.w400,
+      letterSpacing: -0.3,
+    ),
+    bodyMd: TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 14,
+      height: 1.4,
+      fontWeight: FontWeight.w400,
+      letterSpacing: -0.2,
+    ),
+    bodySm: TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 12,
+      height: 1.35,
+      fontWeight: FontWeight.w400,
+    ),
+    label: TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 13,
+      height: 1.3,
+      fontWeight: FontWeight.w500,
+    ),
+    caption: TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 11,
+      height: 1.35,
+      fontWeight: FontWeight.w400,
+    ),
+    button: TextStyle(
+      fontFamily: fontFamily,
+      fontSize: 16,
+      height: 1.2,
+      fontWeight: FontWeight.w600,
+      letterSpacing: -0.2,
     ),
   );
 

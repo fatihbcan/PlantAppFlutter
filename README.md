@@ -30,15 +30,43 @@ close button is what ends onboarding, per the brief: the completion flag is
 persisted and the router replaces the stack with home. A user who completes
 the flow never sees it again, on this launch or any later one.
 
-**Home** — a tinted header band carrying the greeting and search, a premium
-banner, a horizontal carousel from `getQuestions`, a categories grid from
-`getCategories`, and the design's bottom bar. Pull to refresh; search filters
-the grid live.
+**Home** — a header band carrying the greeting, the search field and the two
+painted leaves tucked behind it, a premium strip, a horizontal carousel from
+`getQuestions`, a categories grid from `getCategories`, and the design's
+bottom bar. Pull to refresh; search filters the grid live.
+
+## Matching the design
+
+The artwork is the Figma file's own image fills rather than lookalikes, each
+cropped to its subject so a centred fit lands where the design puts it. The
+three care badges ship in the file as one green master that it tints per
+placement; they are vendored already tinted.
+
+Type is **Rubik**, bundled under `assets/fonts` so it renders identically on
+both platforms instead of falling back to SF Pro or Roboto.
+
+The icons are the design's own exports, in `assets/icons` — none of them
+exist in Material's set, and approximating them by eye is what made the
+bottom bar and the paywall's feature strip read wrong. All but the premium
+strip's envelope are single-colour masters, so `core/icons/app_icons.dart`
+tints them from the theme. The paywall's three feature marks are whole tiles
+— ground and glyph together — rather than a glyph on a box of our own; the
+third one's own export is corrupt in the file, so it is composed from the
+design's tile ground and the design's leaf. They ship at 1x for the file's
+360dp frame, so re-exporting at 3x is a straight file swap if they need to be
+sharper.
+
+The viewfinder over the welcome plant and the phone's camera preview is still
+drawn (`shared/widgets/scan_frame.dart`): the design stretches the same mark
+to a different aspect on each screen, which a bitmap cannot follow without
+distorting its own stroke weight.
 
 ## Layout
 
 ```
-assets/images/    artwork exported from the design
+assets/images/    artwork from the design file's own image fills
+assets/icons/     icons exported from the design file
+assets/fonts/     Rubik, the design's typeface
 lib/
   app/            composition root — router, guards, DI, root widget
   core/           theme, network, storage, l10n, asset paths

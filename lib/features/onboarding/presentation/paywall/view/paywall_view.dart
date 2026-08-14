@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hubx_flutter_case/core/assets/app_assets.dart';
+import 'package:hubx_flutter_case/core/icons/app_icons.dart';
+import 'package:hubx_flutter_case/core/theme/app_typography.dart';
 import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 import 'package:hubx_flutter_case/features/onboarding/domain/entity/subscription_plan.dart';
 import 'package:hubx_flutter_case/features/onboarding/presentation/paywall/bloc/paywall_bloc.dart';
@@ -46,7 +48,6 @@ class PaywallView extends StatelessWidget {
             CustomScrollView(
               slivers: <Widget>[
                 SliverToBoxAdapter(child: _Hero(l10n: l10n)),
-                SliverToBoxAdapter(child: _Features(l10n: l10n)),
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(
                     dimens.pageGutter,
@@ -57,7 +58,7 @@ class PaywallView extends StatelessWidget {
                   sliver: SliverList.separated(
                     itemCount: state.plans.length,
                     separatorBuilder: (_, _) =>
-                        SizedBox(height: dimens.spaceMd),
+                        SizedBox(height: dimens.spaceLg),
                     itemBuilder: (BuildContext context, int index) {
                       final SubscriptionPlan plan = state.plans[index];
                       return PaywallPlanTile(
@@ -99,6 +100,12 @@ class PaywallView extends StatelessWidget {
       };
 }
 
+/// The photo, the title over it, and the feature strip sitting on its lower
+/// edge.
+///
+/// The design overlaps all three inside the photo's own box rather than
+/// stacking them down the page, which is why this is a [Stack] and not a
+/// column of sections.
 class _Hero extends StatelessWidget {
   const _Hero({required this.l10n});
 
@@ -109,22 +116,21 @@ class _Hero extends StatelessWidget {
     final colors = context.appColors;
     final dimens = context.appDimens;
 
-    return Stack(
-      children: <Widget>[
-        // The photo keeps its own proportions and runs edge to edge under the
-        // status bar. The page scrolls, so a tall hero costs nothing.
-        AspectRatio(
-          aspectRatio: _heroAspectRatio,
-          child: Image.asset(
+    return AspectRatio(
+      aspectRatio: _heroAspectRatio,
+      child: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          Image.asset(
             AppAssets.paywallHero,
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
+            excludeFromSemantics: true,
           ),
-        ),
-        // The export already fades towards black; this carries that fade the
-        // rest of the way into the page colour so there is no visible seam.
-        Positioned.fill(
-          child: DecoratedBox(
+          // The export already fades towards black; this carries that fade the
+          // rest of the way into the page colour so there is no visible seam,
+          // and darkens the ground the title and cards sit on.
+          DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -137,37 +143,47 @@ class _Hero extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        Positioned(
-          left: dimens.pageGutter,
-          right: dimens.pageGutter,
-          bottom: dimens.spaceXl,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              _PremiumTitle(l10n: l10n),
-              SizedBox(height: dimens.spaceXs),
-              Text(
-                l10n.paywallSubtitle,
-                style: context.appText.bodyMd.copyWith(
-                  color: colors.onPremiumMuted,
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: dimens.pageGutter),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      _PremiumTitle(l10n: l10n),
+                      SizedBox(height: dimens.spaceXs),
+                      Text(
+                        l10n.paywallSubtitle,
+                        style: context.appText.bodyMd.copyWith(
+                          color: colors.onPremiumMuted,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: dimens.spaceXl),
+                _Features(l10n: l10n),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  /// The export's proportions with its bottom quarter cropped off. That part
-  /// is the photo's fade to black and carries no subject, and dropping it is
-  /// what puts the title and the feature strip where the design has them.
-  static const double _heroAspectRatio = 393 / 384;
+  /// The export's own proportions — the design runs it edge to edge and lets
+  /// the feature strip finish on its bottom edge.
+  static const double _heroAspectRatio = 375 / 470;
 
   /// Where the fade into the page colour begins, down the hero.
-  static const double _fadeStart = 0.55;
+  static const double _fadeStart = 0.45;
 }
 
 /// "PlantApp Premium", with the product name carrying the weight.
@@ -180,7 +196,6 @@ class _PremiumTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextStyle base = context.appText.displayMd.copyWith(
       color: context.appColors.onPremium,
-      fontWeight: FontWeight.w400,
     );
     final int split = l10n.paywallTitle.indexOf(l10n.appTitle);
 
@@ -192,7 +207,7 @@ class _PremiumTitle extends StatelessWidget {
         children: <InlineSpan>[
           TextSpan(
             text: l10n.appTitle,
-            style: base.copyWith(fontWeight: FontWeight.w800),
+            style: base.copyWith(fontWeight: AppTypography.emphasis),
           ),
           TextSpan(
             text: l10n.paywallTitle.substring(split + l10n.appTitle.length),
@@ -219,19 +234,19 @@ class _Features extends StatelessWidget {
       child: Row(
         children: <Widget>[
           PaywallFeatureCard(
-            icon: Icons.all_inclusive_rounded,
+            icon: AppIcon.featureUnlimited,
             title: l10n.paywallFeatureUnlimitedTitle,
             body: l10n.paywallFeatureUnlimitedBody,
           ),
           SizedBox(width: dimens.spaceMd),
           PaywallFeatureCard(
-            icon: Icons.bolt_rounded,
+            icon: AppIcon.featureFaster,
             title: l10n.paywallFeatureFasterTitle,
             body: l10n.paywallFeatureFasterBody,
           ),
           SizedBox(width: dimens.spaceMd),
           PaywallFeatureCard(
-            icon: Icons.eco_rounded,
+            icon: AppIcon.featureDetailed,
             title: l10n.paywallFeatureDetailedTitle,
             body: l10n.paywallFeatureDetailedBody,
           ),
@@ -254,11 +269,14 @@ class _Footer extends StatelessWidget {
     final String price = state.selectedPlan?.formattedPrice ?? '';
 
     return Padding(
+      // viewPadding rather than padding: this page draws under the system
+      // bars on purpose, so the inset it has to clear is the raw one. Without
+      // it the legal copy ends up beneath the navigation bar.
       padding: EdgeInsets.fromLTRB(
         dimens.pageGutter,
-        dimens.spaceXl,
+        dimens.spaceLg,
         dimens.pageGutter,
-        dimens.spaceXl + MediaQuery.paddingOf(context).bottom,
+        dimens.spaceMd + MediaQuery.viewPaddingOf(context).bottom,
       ),
       child: Column(
         children: <Widget>[
@@ -276,10 +294,11 @@ class _Footer extends StatelessWidget {
             l10n.paywallLegal(price),
             textAlign: TextAlign.center,
             style: context.appText.caption.copyWith(
-              color: colors.onPremiumMuted.withValues(alpha: 0.7),
+              fontSize: 9,
+              color: colors.onPremiumMuted.withValues(alpha: 0.6),
             ),
           ),
-          SizedBox(height: dimens.spaceMd),
+          SizedBox(height: dimens.spaceSm),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -306,7 +325,7 @@ class _FooterLink extends StatelessWidget {
     return Text(
       label,
       style: context.appText.caption.copyWith(
-        color: context.appColors.onPremiumMuted.withValues(alpha: 0.7),
+        color: context.appColors.onPremiumMuted.withValues(alpha: 0.85),
       ),
     );
   }
@@ -340,25 +359,27 @@ class _CloseButton extends StatelessWidget {
     final dimens = context.appDimens;
 
     return Positioned(
-      top: MediaQuery.paddingOf(context).top + dimens.spaceSm,
+      top: MediaQuery.viewPaddingOf(context).top + dimens.spaceSm,
       right: dimens.pageGutter,
       child: Semantics(
         button: true,
         label: l10n.paywallCloseSemantics,
         child: Material(
-          color: context.appColors.premiumCanvas.withValues(alpha: 0.5),
+          color: Colors.black.withValues(alpha: 0.45),
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: () => context.read<PaywallBloc>().add(
               const PaywallEvent.closePressed(),
             ),
-            child: Padding(
-              padding: EdgeInsets.all(dimens.spaceSm),
-              child: Icon(
-                Icons.close_rounded,
-                size: context.appDimens.iconSm,
-                color: context.appColors.onPremiumMuted,
+            child: SizedBox.square(
+              dimension: _size,
+              child: Center(
+                child: AppIconView(
+                  icon: AppIcon.close,
+                  size: dimens.iconSm,
+                  color: context.appColors.onPremium,
+                ),
               ),
             ),
           ),
@@ -366,4 +387,6 @@ class _CloseButton extends StatelessWidget {
       ),
     );
   }
+
+  static const double _size = 32;
 }

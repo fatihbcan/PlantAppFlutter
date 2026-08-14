@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hubx_flutter_case/core/icons/app_icons.dart';
 import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 
 /// Search input at the top of home.
+///
+/// The fill is deliberately not opaque: in the design the painted leaf behind
+/// the field shows faintly through its right-hand end, and a solid white
+/// would cut it off with a hard edge.
 ///
 /// Stateful only to own its [TextEditingController]; the query itself lives
 /// in [HomeState].
@@ -35,50 +40,64 @@ class _HomeSearchFieldState extends State<HomeSearchField> {
     final colors = context.appColors;
     final dimens = context.appDimens;
 
+    final OutlineInputBorder border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(dimens.radiusMd),
+      borderSide: BorderSide(color: colors.outline),
+    );
+
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: _controller,
       builder: (BuildContext context, TextEditingValue value, Widget? _) {
-        return TextField(
-          controller: _controller,
-          onChanged: widget.onChanged,
-          textInputAction: TextInputAction.search,
-          style: context.appText.bodyMd.copyWith(color: colors.onCanvas),
-          decoration: InputDecoration(
-            hintText: widget.hintText,
-            hintStyle: context.appText.bodyMd.copyWith(
-              color: colors.onCanvasSubtle,
-            ),
-            filled: true,
-            fillColor: colors.surface,
-            prefixIcon: Icon(
-              Icons.search_rounded,
-              size: dimens.iconMd,
-              color: colors.onCanvasSubtle,
-            ),
-            suffixIcon: value.text.isEmpty
-                ? null
-                : IconButton(
-                    icon: Icon(Icons.close_rounded, size: dimens.iconSm),
-                    color: colors.onCanvasSubtle,
-                    onPressed: () {
-                      _controller.clear();
-                      widget.onCleared();
-                    },
-                  ),
-            contentPadding: EdgeInsets.symmetric(vertical: dimens.spaceMd),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(dimens.radiusMd),
-              borderSide: BorderSide(color: colors.outline),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(dimens.radiusMd),
-              borderSide: BorderSide(color: colors.outline),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(dimens.radiusMd),
-              borderSide: BorderSide(
-                color: colors.brand,
-                width: dimens.strokeThick,
+        return SizedBox(
+          height: _height,
+          child: TextField(
+            controller: _controller,
+            onChanged: widget.onChanged,
+            textInputAction: TextInputAction.search,
+            textAlignVertical: TextAlignVertical.center,
+            style: context.appText.bodyLg.copyWith(color: colors.onCanvas),
+            decoration: InputDecoration(
+              hintText: widget.hintText,
+              hintStyle: context.appText.bodyLg.copyWith(
+                color: colors.onCanvasSubtle,
+              ),
+              filled: true,
+              fillColor: colors.surface.withValues(alpha: 0.88),
+              isDense: true,
+              prefixIcon: Padding(
+                padding: EdgeInsets.only(
+                  left: dimens.spaceLg,
+                  right: dimens.spaceMd,
+                ),
+                child: AppIconView(
+                  icon: AppIcon.search,
+                  size: dimens.iconMd,
+                  color: colors.onCanvasSubtle,
+                ),
+              ),
+              prefixIconConstraints: const BoxConstraints(),
+              suffixIcon: value.text.isEmpty
+                  ? null
+                  : IconButton(
+                      icon: AppIconView(
+                        icon: AppIcon.close,
+                        size: dimens.iconSm,
+                        color: colors.onCanvasSubtle,
+                      ),
+                      onPressed: () {
+                        _controller.clear();
+                        widget.onCleared();
+                      },
+                    ),
+              contentPadding: EdgeInsets.zero,
+              border: border,
+              enabledBorder: border,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(dimens.radiusMd),
+                borderSide: BorderSide(
+                  color: colors.brand,
+                  width: dimens.strokeThick,
+                ),
               ),
             ),
           ),
@@ -86,4 +105,6 @@ class _HomeSearchFieldState extends State<HomeSearchField> {
       },
     );
   }
+
+  static const double _height = 44;
 }

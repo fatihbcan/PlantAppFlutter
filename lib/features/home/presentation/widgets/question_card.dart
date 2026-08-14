@@ -23,7 +23,6 @@ class QuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dimens = context.appDimens;
-    final colors = context.appColors;
 
     return Semantics(
       button: true,
@@ -40,25 +39,33 @@ class QuestionCard extends StatelessWidget {
               fit: StackFit.expand,
               children: <Widget>[
                 AppNetworkImage(url: imageUrl, width: width),
-                // Scrim keeps the title legible over any photograph.
-                DecoratedBox(
+                // The design's scrim is a deep, late fade — the photo stays
+                // clear down to two thirds of the card and then goes almost
+                // black behind the title, rather than being greyed all over.
+                const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.center,
+                      begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: <Color>[Colors.transparent, colors.scrim],
+                      stops: <double>[0.6, 0.8, 1],
+                      colors: <Color>[
+                        Colors.transparent,
+                        Color(0x8A000000),
+                        Color(0xCC000000),
+                      ],
                     ),
                   ),
                 ),
                 Positioned(
-                  left: dimens.spaceMd,
-                  right: dimens.spaceMd,
-                  bottom: dimens.spaceMd,
+                  left: dimens.spaceLg,
+                  right: dimens.spaceLg,
+                  bottom: dimens.spaceLg,
                   child: Text(
                     title,
-                    maxLines: 3,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: context.appText.titleMd.copyWith(
+                    style: context.appText.titleSm.copyWith(
+                      height: 1.35,
                       color: Colors.white,
                     ),
                   ),

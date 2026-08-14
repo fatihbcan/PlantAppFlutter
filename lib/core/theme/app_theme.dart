@@ -32,6 +32,7 @@ abstract final class AppTheme {
       useMaterial3: true,
       brightness: brightness,
       colorScheme: scheme,
+      fontFamily: AppTypography.fontFamily,
       scaffoldBackgroundColor: colors.canvas,
       splashFactory: InkSparkle.splashFactory,
       extensions: <ThemeExtension<dynamic>>[

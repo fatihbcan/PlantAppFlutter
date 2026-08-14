@@ -28,6 +28,14 @@
   "onboardingWelcomeBody": "Identify more than 3000+ plants and 88% accuracy.",
   "onboardingWelcomeCta": "Get Started",
   "onboardingWelcomeLegal": "By tapping next, you are agreeing to PlantID Terms of Use & Privacy Policy.",
+  "onboardingTermsOfUse": "Terms of Use",
+  "@onboardingTermsOfUse": {
+    "description": "Substring of onboardingWelcomeLegal the design underlines."
+  },
+  "onboardingPrivacyPolicy": "Privacy Policy",
+  "@onboardingPrivacyPolicy": {
+    "description": "Substring of onboardingWelcomeLegal the design underlines."
+  },
 
   "onboardingIdentifyTitle": "Take a photo to identify the plant!",
   "onboardingIdentifyHighlight": "identify",

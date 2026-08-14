@@ -4,6 +4,7 @@ import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 import 'package:hubx_flutter_case/features/onboarding/presentation/intro/bloc/intro_bloc.dart';
 import 'package:hubx_flutter_case/features/onboarding/presentation/intro/widgets/intro_artwork.dart';
 import 'package:hubx_flutter_case/features/onboarding/presentation/intro/widgets/intro_headline.dart';
+import 'package:hubx_flutter_case/features/onboarding/presentation/intro/widgets/intro_legal_text.dart';
 import 'package:hubx_flutter_case/features/onboarding/presentation/intro/widgets/intro_page_dots.dart';
 import 'package:hubx_flutter_case/l10n/gen/app_localizations.dart';
 import 'package:hubx_flutter_case/shared/widgets/app_primary_button.dart';
@@ -65,12 +66,7 @@ class _IntroViewState extends State<IntroView> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(
-                dimens.pageGutter,
-                dimens.spaceLg,
-                dimens.pageGutter,
-                dimens.spaceSm,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: dimens.pageGutter),
               child: AppPrimaryButton(
                 label: page.cta,
                 onPressed: () => context.read<IntroBloc>().add(
@@ -78,35 +74,49 @@ class _IntroViewState extends State<IntroView> {
                 ),
               ),
             ),
-            if (page.legal != null)
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: dimens.spaceXxl),
-                child: Text(
-                  page.legal!,
-                  textAlign: TextAlign.center,
-                  style: context.appText.caption.copyWith(
-                    color: context.appColors.onCanvasSubtle,
-                  ),
-                ),
-              ),
             SizedBox(height: dimens.spaceLg),
-            if (state.showsPageIndicator)
-              IntroPageDots(
-                count: state.pageCount,
-                activeIndex: state.pageIndex,
-                semanticsLabel: l10n.onboardingPageIndicator(
-                  state.humanPageNumber,
-                  state.pageCount,
-                ),
-              ),
+            // Fixed height whichever page is showing, so the CTA sits at the
+            // same point on all three rather than jumping as the footer
+            // swaps between the consent line and the dots.
             SizedBox(
-              height: dimens.spaceLg + MediaQuery.paddingOf(context).bottom,
+              height: _footerHeight,
+              child: Center(
+                child: page.legal != null
+                    // Held to the design's measure so the sentence breaks
+                    // after "PlantID" rather than stretching to the gutters.
+                    ? ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 236),
+                        child: IntroLegalText(
+                          text: page.legal!,
+                          underlined: <String>[
+                            l10n.onboardingTermsOfUse,
+                            l10n.onboardingPrivacyPolicy,
+                          ],
+                        ),
+                      )
+                    : state.showsPageIndicator
+                    ? IntroPageDots(
+                        count: state.pageCount,
+                        activeIndex: state.indicatorIndex,
+                        semanticsLabel: l10n.onboardingPageIndicator(
+                          state.humanPageNumber,
+                          state.pageCount,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ),
+            SizedBox(
+              height: dimens.spaceMd + MediaQuery.paddingOf(context).bottom,
             ),
           ],
         );
       },
     );
   }
+
+  /// Room for two lines of consent copy — the taller of the two footers.
+  static const double _footerHeight = 34;
 
   List<_IntroPageContent> _pagesFor(AppL10n l10n) => <_IntroPageContent>[
     _IntroPageContent(
@@ -166,10 +176,10 @@ class _IntroPageBody extends StatelessWidget {
                 isHighlightUnderlined: content.underlinesHighlight,
               ),
               if (content.body != null) ...<Widget>[
-                SizedBox(height: dimens.spaceMd),
+                SizedBox(height: dimens.spaceSm),
                 Text(
                   content.body!,
-                  style: context.appText.bodyMd.copyWith(
+                  style: context.appText.bodyLg.copyWith(
                     color: context.appColors.onCanvasMuted,
                   ),
                 ),
@@ -177,7 +187,7 @@ class _IntroPageBody extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: dimens.spaceLg),
+        SizedBox(height: dimens.spaceMd),
         Expanded(child: IntroArtworkView(artwork: content.artwork)),
       ],
     );
