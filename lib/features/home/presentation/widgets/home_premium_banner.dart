@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hubx_flutter_case/core/icons/app_icons.dart';
 import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 
-/// The gold "FREE Premium Available" strip under the search field.
+/// The dark "FREE Premium Available" strip under the search field.
+///
+/// Every value here — the flat `#24201A` ground, the two golds, the envelope
+/// illustration — is taken from the design's own export rather than matched
+/// by eye.
 class HomePremiumBanner extends StatelessWidget {
   const HomePremiumBanner({
     required this.title,
@@ -25,19 +30,19 @@ class HomePremiumBanner extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(dimens.radiusMd),
         child: Container(
-          padding: EdgeInsets.all(dimens.spaceMd),
+          height: _height,
+          padding: EdgeInsets.symmetric(horizontal: dimens.spaceLg),
           decoration: BoxDecoration(
+            color: colors.bannerSurface,
             borderRadius: BorderRadius.circular(dimens.radiusMd),
-            gradient: LinearGradient(
-              colors: <Color>[colors.premiumCanvas, colors.premiumSurface],
-            ),
           ),
           child: Row(
             children: <Widget>[
-              Icon(
-                Icons.workspace_premium_rounded,
+              AppIconView(
+                icon: AppIcon.envelope,
+                size: _envelopeWidth,
+                height: _envelopeWidth * _envelopeAspect,
                 color: colors.premiumAccent,
-                size: dimens.iconMd,
               ),
               SizedBox(width: dimens.spaceMd),
               Expanded(
@@ -47,24 +52,31 @@ class HomePremiumBanner extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: context.appText.titleSm.copyWith(
                         color: colors.premiumAccent,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     SizedBox(height: dimens.spaceXxs),
                     Text(
                       body,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: context.appText.bodySm.copyWith(
-                        color: colors.onPremiumMuted,
+                        fontSize: 13,
+                        color: colors.premiumAccentMuted,
                       ),
                     ),
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: colors.premiumAccent,
-                size: dimens.iconMd,
+              SizedBox(width: dimens.spaceSm),
+              AppIconView(
+                icon: AppIcon.chevronRight,
+                size: _chevronSize,
+                color: colors.premiumAccentMuted,
               ),
             ],
           ),
@@ -72,4 +84,11 @@ class HomePremiumBanner extends StatelessWidget {
       ),
     );
   }
+
+  static const double _height = 66;
+  static const double _chevronSize = 20;
+  static const double _envelopeWidth = 44;
+
+  /// Height over width of the exported illustration, badge included.
+  static const double _envelopeAspect = 48 / 52;
 }

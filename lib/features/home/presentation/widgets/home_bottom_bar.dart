@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hubx_flutter_case/core/icons/app_icons.dart';
 import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 import 'package:hubx_flutter_case/l10n/gen/app_localizations.dart';
 
@@ -17,7 +18,6 @@ class HomeBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppL10n l10n = AppL10n.of(context);
     final colors = context.appColors;
-    final dimens = context.appDimens;
 
     return SizedBox(
       // Room above the bar for the scan button to sit proud of it.
@@ -39,24 +39,25 @@ class HomeBottomBar extends StatelessWidget {
                   child: Row(
                     children: <Widget>[
                       _Destination(
-                        icon: Icons.home_rounded,
+                        icon: AppIcon.pot,
                         label: l10n.navHome,
                         isCurrent: true,
                       ),
                       _Destination(
-                        icon: Icons.health_and_safety_outlined,
+                        icon: AppIcon.shieldPlus,
                         label: l10n.navDiagnose,
                         isCurrent: false,
                       ),
-                      // The gap the scan button sits in.
-                      SizedBox(width: dimens.spaceXxl * 2),
+                      // The gap the scan button sits in — one column wide, so
+                      // the four labels stay on the design's fifths.
+                      const Spacer(),
                       _Destination(
-                        icon: Icons.local_florist_outlined,
+                        icon: AppIcon.leaf,
                         label: l10n.navMyGarden,
                         isCurrent: false,
                       ),
                       _Destination(
-                        icon: Icons.person_outline_rounded,
+                        icon: AppIcon.person,
                         label: l10n.navProfile,
                         isCurrent: false,
                       ),
@@ -79,7 +80,7 @@ class HomeBottomBar extends StatelessWidget {
   }
 
   static const double _barHeight = 64;
-  static const double _scanOverhang = 20;
+  static const double _scanOverhang = 24;
 }
 
 /// One labelled destination in the bar.
@@ -90,14 +91,15 @@ class _Destination extends StatelessWidget {
     required this.isCurrent,
   });
 
-  final IconData icon;
+  final AppIcon icon;
   final String label;
   final bool isCurrent;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final Color tint = isCurrent ? colors.brand : colors.onCanvasSubtle;
+    final dimens = context.appDimens;
+    final Color tint = isCurrent ? colors.brand : colors.navInactive;
 
     return Expanded(
       child: Semantics(
@@ -108,9 +110,9 @@ class _Destination extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(icon, size: context.appDimens.iconMd, color: tint),
-            SizedBox(height: context.appDimens.spaceXxs),
-            Text(label, style: context.appText.caption.copyWith(color: tint)),
+            AppIconView(icon: icon, size: dimens.iconMd, color: tint),
+            SizedBox(height: dimens.spaceXs),
+            Text(label, style: context.appText.bodySm.copyWith(color: tint)),
           ],
         ),
       ),
@@ -133,20 +135,28 @@ class _ScanButton extends StatelessWidget {
       button: true,
       label: semanticsLabel,
       excludeSemantics: true,
-      child: Material(
-        color: colors.brand,
-        shape: const CircleBorder(),
-        elevation: _elevation,
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed,
-          child: SizedBox(
-            width: _size,
-            height: _size,
-            child: Icon(
-              Icons.document_scanner_outlined,
-              color: colors.onPremium,
-              size: context.appDimens.iconMd,
+      // The design rings the button in a lighter green so it reads as lifted
+      // off the bar rather than punched through it.
+      child: Container(
+        width: _size,
+        height: _size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: colors.brand.withValues(alpha: 0.35),
+        ),
+        padding: const EdgeInsets.all(_ringWidth),
+        child: Material(
+          color: colors.brand,
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onPressed,
+            child: Center(
+              child: AppIconView(
+                icon: AppIcon.scan,
+                size: _glyphSize,
+                color: colors.onPremium,
+              ),
             ),
           ),
         ),
@@ -154,6 +164,7 @@ class _ScanButton extends StatelessWidget {
     );
   }
 
-  static const double _size = 60;
-  static const double _elevation = 4;
+  static const double _size = 64;
+  static const double _ringWidth = 4;
+  static const double _glyphSize = 26;
 }

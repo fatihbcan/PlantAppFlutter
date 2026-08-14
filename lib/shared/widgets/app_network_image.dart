@@ -9,6 +9,7 @@ class AppNetworkImage extends StatelessWidget {
   const AppNetworkImage({
     required this.url,
     this.fit = BoxFit.cover,
+    this.alignment = Alignment.center,
     this.width,
     this.height,
     this.semanticLabel,
@@ -17,6 +18,7 @@ class AppNetworkImage extends StatelessWidget {
 
   final String url;
   final BoxFit fit;
+  final AlignmentGeometry alignment;
   final double? width;
   final double? height;
   final String? semanticLabel;
@@ -28,6 +30,7 @@ class AppNetworkImage extends StatelessWidget {
     return Image.network(
       url,
       fit: fit,
+      alignment: alignment,
       width: width,
       height: height,
       semanticLabel: semanticLabel,

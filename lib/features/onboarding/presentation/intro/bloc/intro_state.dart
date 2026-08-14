@@ -20,6 +20,11 @@ abstract class IntroState with _$IntroState {
   /// Page dots are only drawn from the second page onward in the design.
   bool get showsPageIndicator => !isFirstPage;
 
+  /// Which dot is filled. The design's three dots cover the two onboarding
+  /// pages and the paywall that follows them — the welcome page sits before
+  /// the run and shows no dots at all, so the first dot belongs to page two.
+  int get indicatorIndex => pageIndex - 1;
+
   /// 1-based position, for the screen-reader announcement.
   int get humanPageNumber => pageIndex + 1;
 }

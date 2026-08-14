@@ -31,25 +31,30 @@ class CategoryTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(dimens.radiusMd),
         child: Container(
           decoration: BoxDecoration(
-            // The design tints these cells rather than leaving them the
-            // page's white, which is what separates the grid from the canvas.
-            color: colors.surfaceMuted,
+            // White cells with a hairline edge, as in the design — the tint
+            // that used to be here made the grid read as a block of chips.
+            color: colors.surface,
             borderRadius: BorderRadius.circular(dimens.radiusMd),
             border: Border.all(color: colors.outline),
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(
             children: <Widget>[
-              Align(
-                alignment: Alignment.bottomRight,
-                child: FractionallySizedBox(
-                  widthFactor: 0.62,
-                  heightFactor: 0.86,
-                  child: AppNetworkImage(url: imageUrl, fit: BoxFit.contain),
+              // The artwork sits in the lower right and is allowed to run to
+              // the cell's edges rather than being inset with the title.
+              Positioned(
+                right: 0,
+                bottom: 0,
+                top: dimens.spaceXl,
+                left: dimens.spaceXxl,
+                child: AppNetworkImage(
+                  url: imageUrl,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.bottomRight,
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(dimens.spaceMd),
+                padding: EdgeInsets.all(dimens.spaceLg),
                 child: SizedBox(
                   width: double.infinity,
                   child: Text(
@@ -57,6 +62,7 @@ class CategoryTile extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: context.appText.titleMd.copyWith(
+                      fontWeight: FontWeight.w600,
                       color: colors.onCanvas,
                     ),
                   ),

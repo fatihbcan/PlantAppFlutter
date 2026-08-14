@@ -85,7 +85,7 @@ class _Header extends StatelessWidget {
           onSearchCleared: () =>
               context.read<HomeBloc>().add(const HomeEvent.searchCleared()),
         ),
-        SizedBox(height: dimens.spaceLg),
+        SizedBox(height: dimens.spaceXxl),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: dimens.pageGutter),
           child: HomePremiumBanner(
@@ -94,7 +94,7 @@ class _Header extends StatelessWidget {
             onTap: () {},
           ),
         ),
-        SizedBox(height: dimens.spaceLg),
+        SizedBox(height: dimens.spaceXl),
       ],
     );
   }
@@ -110,13 +110,14 @@ class _QuestionsSection extends StatelessWidget {
     final dimens = context.appDimens;
     // Cards show a sliver of the next one, which signals horizontal scroll
     // without needing an affordance.
-    final double cardWidth = MediaQuery.sizeOf(context).width * 0.62;
+    final double cardWidth =
+        MediaQuery.sizeOf(context).width * _cardWidthFactor;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(
-          height: cardWidth * 0.82,
+          height: cardWidth * _cardAspect,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: dimens.pageGutter),
@@ -133,10 +134,15 @@ class _QuestionsSection extends StatelessWidget {
             },
           ),
         ),
-        SizedBox(height: dimens.spaceXl),
+        SizedBox(height: dimens.spaceXxl),
       ],
     );
   }
+
+  /// Card width and height, as fractions of the screen width and of the card
+  /// itself — the design's own proportions.
+  static const double _cardWidthFactor = 0.66;
+  static const double _cardAspect = 0.685;
 }
 
 class _CategoriesSection extends StatelessWidget {
@@ -183,9 +189,11 @@ class _CategoriesSection extends StatelessWidget {
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           // Two columns on a phone, more once there is room for them.
           crossAxisCount: MediaQuery.sizeOf(context).width > 600 ? 3 : 2,
-          mainAxisSpacing: dimens.spaceMd,
-          crossAxisSpacing: dimens.spaceMd,
-          childAspectRatio: 1.4,
+          mainAxisSpacing: dimens.spaceLg,
+          crossAxisSpacing: dimens.spaceLg,
+          // Very nearly square, as in the design — the cells used to be half
+          // this tall, which is what left the artwork in them looking cramped.
+          childAspectRatio: 0.98,
         ),
         itemCount: categories.length,
         itemBuilder: (BuildContext context, int index) {

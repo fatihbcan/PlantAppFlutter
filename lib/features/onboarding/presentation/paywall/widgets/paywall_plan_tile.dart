@@ -40,7 +40,10 @@ class PaywallPlanTile extends StatelessWidget {
             AnimatedContainer(
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOut,
-              padding: EdgeInsets.all(dimens.spaceLg),
+              padding: EdgeInsets.symmetric(
+                horizontal: dimens.spaceLg,
+                vertical: dimens.spaceMd,
+              ),
               decoration: BoxDecoration(
                 color: colors.premiumSurface,
                 borderRadius: BorderRadius.circular(dimens.radiusLg),
@@ -60,7 +63,7 @@ class PaywallPlanTile extends StatelessWidget {
                       children: <Widget>[
                         Text(
                           title,
-                          style: context.appText.titleSm.copyWith(
+                          style: context.appText.titleMd.copyWith(
                             color: colors.onPremium,
                           ),
                         ),
@@ -68,6 +71,7 @@ class PaywallPlanTile extends StatelessWidget {
                         Text(
                           subtitle,
                           style: context.appText.bodySm.copyWith(
+                            fontSize: 13,
                             color: colors.onPremiumMuted,
                           ),
                         ),
@@ -96,25 +100,26 @@ class _SelectionDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final double size = context.appDimens.iconSm + context.appDimens.spaceXs;
+    const double size = 24;
 
+    // Selected is a solid green disc with a white centre; unselected is a
+    // plain darker disc, not an empty ring — that is what the design draws.
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: isSelected ? colors.brand : colors.premiumOutline,
-          width: context.appDimens.strokeThick,
-        ),
+        color: isSelected
+            ? colors.brand
+            : colors.onPremium.withValues(alpha: 0.09),
       ),
       child: isSelected
           ? Center(
               child: Container(
-                width: size / 2.4,
-                height: size / 2.4,
+                width: size / 2.6,
+                height: size / 2.6,
                 decoration: BoxDecoration(
-                  color: colors.brand,
+                  color: colors.onPremium,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -149,8 +154,9 @@ class _PlanBadge extends StatelessWidget {
       child: Text(
         label,
         style: context.appText.caption.copyWith(
+          fontSize: 12,
           color: context.appColors.onPremium,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );

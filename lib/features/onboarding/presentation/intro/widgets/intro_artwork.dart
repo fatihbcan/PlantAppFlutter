@@ -1,6 +1,8 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:hubx_flutter_case/core/assets/app_assets.dart';
-import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
+import 'package:hubx_flutter_case/shared/widgets/scan_frame.dart';
 
 /// Which illustration an intro page shows.
 ///
@@ -9,14 +11,11 @@ import 'package:hubx_flutter_case/core/theme/theme_extensions.dart';
 /// bundle that a test can build without a widget tree.
 enum IntroArtwork { welcome, identify, careGuides }
 
-/// Badge diameter as a fraction of the artwork's width.
-const double _badgeWidthFactor = 0.11;
-
 /// Draws the artwork for one intro page.
 ///
-/// Every piece is laid out as a fraction of the space it is given, so the
-/// composition holds its proportions from a small phone to a tablet instead of
-/// drifting apart at fixed offsets.
+/// Every piece is laid out as a fraction of the space it is given, taken from
+/// the design's own proportions, so the composition holds from a small phone
+/// to a tablet instead of drifting apart at fixed offsets.
 class IntroArtworkView extends StatelessWidget {
   const IntroArtworkView({required this.artwork, super.key});
 
@@ -32,199 +31,276 @@ class IntroArtworkView extends StatelessWidget {
   }
 }
 
-/// The potted plant with the three care badges floating around it.
+/// The potted plant, the viewfinder over it, and the three care badges.
 class _WelcomeArtwork extends StatelessWidget {
   const _WelcomeArtwork();
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
-
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        // The badges scale with the artwork so they stay stickers on the
-        // photo rather than growing into buttons on a large screen.
-        final double badgeSize = constraints.maxWidth * _badgeWidthFactor;
+        final double width = constraints.maxWidth;
+        final double height = constraints.maxHeight;
+
+        // The plant is laid out explicitly rather than through an Align, so
+        // the badges can hang off its rendered rect. In the design they are
+        // pinned to the plant, not to the page, and anchoring them to the box
+        // instead is what let them drift.
+        final double plantHeight = height * _plantHeightFactor;
+        final double plantWidth = plantHeight * _plantAspect;
+        final double plantLeft = (width - plantWidth) / 2;
+        final double plantTop = height * _plantTopFactor;
+
+        Widget badge(String asset, double cx, double cy, double scale) {
+          final double size = plantWidth * scale;
+          return Positioned(
+            left: plantLeft + plantWidth * cx - size / 2,
+            top: plantTop + plantHeight * cy - size / 2,
+            width: size,
+            child: Image.asset(
+              asset,
+              fit: BoxFit.contain,
+              excludeFromSemantics: true,
+            ),
+          );
+        }
 
         return Stack(
-          fit: StackFit.expand,
+          clipBehavior: Clip.none,
           children: <Widget>[
-            // The export carries wide empty margins, so cover — not contain —
-            // is what makes the plant fill the frame the way the design does.
-            Image.asset(AppAssets.welcomePlant, fit: BoxFit.cover),
-            _Badge(
-              alignment: const Alignment(-0.57, -0.70),
-              size: badgeSize,
-              color: colors.accentViolet,
-              icon: Icons.sanitizer_rounded,
+            Positioned(
+              left: plantLeft,
+              top: plantTop,
+              width: plantWidth,
+              height: plantHeight,
+              child: const Image(
+                image: AssetImage(AppAssets.welcomePlant),
+                fit: BoxFit.fill,
+                excludeFromSemantics: true,
+              ),
             ),
-            _Badge(
-              alignment: const Alignment(0.56, -0.69),
-              size: badgeSize,
-              color: colors.accentAmber,
-              icon: Icons.wb_sunny_rounded,
+            const Align(
+              alignment: Alignment(0, -0.225),
+              child: FractionallySizedBox(
+                widthFactor: 0.62,
+                heightFactor: 0.44,
+                child: ScanFrame(),
+              ),
             ),
-            _Badge(
-              alignment: const Alignment(0.34, 0.40),
-              size: badgeSize,
-              color: colors.accentAzure,
-              icon: Icons.water_drop_rounded,
+            badge(AppAssets.badgeSpray, 0.109, 0.126, 0.212),
+            badge(AppAssets.badgeSun, 0.883, 0.135, 0.154),
+            badge(AppAssets.badgeWater, 0.737, 0.824, 0.116),
+          ],
+        );
+      },
+    );
+  }
+
+  /// The plant export's own aspect, and where its box sits in the artwork
+  /// area — both taken from the design.
+  static const double _plantAspect = 200 / 332;
+  static const double _plantHeightFactor = 0.87;
+  static const double _plantTopFactor = 0.026;
+}
+
+/// One care badge sitting on the artwork.
+///
+/// The badges are exported already tinted, so this only has to place and size
+/// them. They are decorative — the copy beside them already says what the app
+/// does — so they carry no semantics.
+class _Badge extends StatelessWidget {
+  const _Badge({
+    required this.alignment,
+    required this.size,
+    required this.asset,
+  });
+
+  final Alignment alignment;
+  final double size;
+  final String asset;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: alignment,
+      child: Image.asset(
+        asset,
+        width: size,
+        fit: BoxFit.contain,
+        excludeFromSemantics: true,
+      ),
+    );
+  }
+}
+
+/// The phone mockup with the plant growing out behind it and the viewfinder
+/// over its camera preview.
+class _IdentifyArtwork extends StatelessWidget {
+  const _IdentifyArtwork();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double width = constraints.maxWidth;
+        final double height = constraints.maxHeight;
+
+        // The phone's own proportions, from the export.
+        final double phoneWidth = width * _phoneWidthFactor;
+        final double phoneHeight = phoneWidth * _phoneAspect;
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: <Widget>[
+            // The plant stands behind the phone and only its crown shows,
+            // which is what the design's silhouette depends on.
+            Positioned(
+              left: (width - phoneWidth * 0.72) / 2,
+              width: phoneWidth * 0.72,
+              top: 0,
+              height: height - phoneHeight * 0.62,
+              child: const Image(
+                image: AssetImage(AppAssets.welcomePlant),
+                fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
+                excludeFromSemantics: true,
+              ),
+            ),
+            Positioned(
+              left: (width - phoneWidth) / 2,
+              // The design leaves a little air under this phone, unlike the
+              // care-guides one which runs behind the CTA.
+              bottom: height * _phoneLiftFactor,
+              width: phoneWidth,
+              height: phoneHeight,
+              child: Stack(
+                children: <Widget>[
+                  const Positioned.fill(
+                    child: Image(
+                      image: AssetImage(AppAssets.identifyPhone),
+                      fit: BoxFit.contain,
+                      excludeFromSemantics: true,
+                    ),
+                  ),
+                  Positioned(
+                    left: phoneWidth * 0.02,
+                    right: phoneWidth * 0.02,
+                    top: phoneHeight * 0.16,
+                    height: phoneHeight * 0.45,
+                    child: const ScanFrame(strokeWidth: 3),
+                  ),
+                ],
+              ),
             ),
           ],
         );
       },
     );
   }
+
+  static const double _phoneWidthFactor = 0.69;
+  static const double _phoneLiftFactor = 0.05;
+
+  /// Height over width of the cropped phone export.
+  static const double _phoneAspect = 320 / 197;
 }
 
-/// One circular care badge sitting on the welcome photo.
-class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.alignment,
-    required this.size,
-    required this.color,
-    required this.icon,
-  });
-
-  final Alignment alignment;
-  final double size;
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: alignment,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: color.withValues(alpha: 0.35),
-              blurRadius: size * 0.35,
-              offset: Offset(0, size * 0.12),
-            ),
-          ],
-        ),
-        // Decorative: the surrounding copy already says what the app does, so
-        // announcing three icons would only add noise for a screen reader.
-        child: ExcludeSemantics(
-          child: Icon(
-            icon,
-            size: size * 0.5,
-            color: context.appColors.onPremium,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The phone mockup framing a plant in the camera viewfinder.
-class _IdentifyArtwork extends StatelessWidget {
-  const _IdentifyArtwork();
-
-  @override
-  Widget build(BuildContext context) {
-    // In the design this phone hangs low on the page — open space under the
-    // headline, then the mockup cut off by the bottom edge. So it is anchored
-    // to the bottom, nudged past it by a fraction of its own height, and
-    // clipped there rather than painting over the CTA.
-    return const ClipRect(
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: FractionallySizedBox(
-          widthFactor: _phoneWidthFactor,
-          child: FractionalTranslation(
-            translation: Offset(0, _bleedFraction),
-            child: Image(
-              image: AssetImage(AppAssets.identifyPhone),
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  static const double _phoneWidthFactor = 0.80;
-  static const double _bleedFraction = 0.06;
-}
-
-/// A phone showing a plant-care page, with the guide cards floating over it.
+/// A phone showing a plant-care page, with the guide cards floating over it
+/// and out-of-focus foliage scattered behind.
 class _CareGuidesArtwork extends StatelessWidget {
   const _CareGuidesArtwork();
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
-
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double width = constraints.maxWidth;
-        final double bezel = width * _bezelFactor;
-        final double radius = width * _phoneRadiusFactor;
+        final double phoneWidth = width * _phoneWidthFactor;
+        final double bezel = phoneWidth * _bezelFactor;
+        final double radius = phoneWidth * _phoneRadiusFactor;
 
-        // The phone is taller than the space it is given: it is anchored to
-        // the top and cut off at the bottom, exactly as the design has it
-        // running past the edge of the screen.
-        return ClipRect(
-          child: Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.topCenter,
-                child: FractionallySizedBox(
-                  widthFactor: _phoneWidthFactor,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: colors.onCanvas,
-                      borderRadius: BorderRadius.circular(radius),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(bezel),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(radius - bezel),
-                        child: Image.asset(
-                          AppAssets.careScreen,
-                          fit: BoxFit.fitWidth,
-                          alignment: Alignment.topCenter,
-                        ),
+        return Stack(
+          clipBehavior: Clip.none,
+          children: <Widget>[
+            // The blurred leaves the design scatters behind everything. The
+            // export is only softly out of focus; the extra blur is what turns
+            // it into the green haze on the page.
+            Positioned.fill(
+              child: ImageFiltered(
+                imageFilter: ui.ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+                child: const Opacity(
+                  opacity: 0.85,
+                  child: Image(
+                    image: AssetImage(AppAssets.leafBlobs),
+                    fit: BoxFit.cover,
+                    excludeFromSemantics: true,
+                  ),
+                ),
+              ),
+            ),
+            // The phone runs off the bottom of the page, stopping at the CTA.
+            Positioned(
+              left: (width - phoneWidth) / 2,
+              top: constraints.maxHeight * _phoneTopFactor,
+              bottom: 0,
+              width: phoneWidth,
+              child: ClipRRect(
+                // Square at the bottom: the phone runs behind the CTA rather
+                // than stopping above it, so rounding there leaves a gap.
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(radius),
+                ),
+                child: ColoredBox(
+                  color: const Color(0xFF0B0B0B),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(bezel, bezel, bezel, 0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(radius - bezel),
+                      ),
+                      child: Image.asset(
+                        AppAssets.careScreen,
+                        fit: BoxFit.fitWidth,
+                        alignment: Alignment.topCenter,
+                        excludeFromSemantics: true,
                       ),
                     ),
                   ),
                 ),
               ),
-              Align(
-                alignment: const Alignment(0.95, -0.85),
-                child: FractionallySizedBox(
-                  widthFactor: _cardsWidthFactor,
-                  child: Image.asset(AppAssets.careCards, fit: BoxFit.contain),
+            ),
+            Align(
+              alignment: const Alignment(0.98, -0.86),
+              child: FractionallySizedBox(
+                widthFactor: _cardsWidthFactor,
+                child: Image.asset(
+                  AppAssets.careCards,
+                  fit: BoxFit.contain,
+                  excludeFromSemantics: true,
                 ),
               ),
-              _Badge(
-                alignment: const Alignment(0.34, -0.95),
-                size: width * _badgeWidthFactor,
-                color: colors.accentViolet,
-                icon: Icons.sanitizer_rounded,
-              ),
-              _Badge(
-                alignment: const Alignment(1.0, -0.72),
-                size: width * _badgeWidthFactor * 0.66,
-                color: colors.accentAmber,
-                icon: Icons.wb_sunny_rounded,
-              ),
-            ],
-          ),
+            ),
+            _Badge(
+              alignment: const Alignment(0.30, -0.98),
+              size: width * 0.095,
+              asset: AppAssets.badgeSpray,
+            ),
+            _Badge(
+              alignment: const Alignment(0.96, -0.80),
+              size: width * 0.075,
+              asset: AppAssets.badgeSun,
+            ),
+          ],
         );
       },
     );
   }
 
   static const double _phoneWidthFactor = 0.72;
-  static const double _cardsWidthFactor = 0.36;
-  static const double _bezelFactor = 0.012;
-  static const double _phoneRadiusFactor = 0.075;
+  static const double _cardsWidthFactor = 0.40;
+  static const double _bezelFactor = 0.035;
+  static const double _phoneRadiusFactor = 0.13;
+
+  /// Where the phone's top edge sits down the artwork box.
+  static const double _phoneTopFactor = 0.10;
 }

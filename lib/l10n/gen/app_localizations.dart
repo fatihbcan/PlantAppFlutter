@@ -171,6 +171,18 @@ abstract class AppL10n {
   /// **'By tapping next, you are agreeing to PlantID Terms of Use & Privacy Policy.'**
   String get onboardingWelcomeLegal;
 
+  /// Substring of onboardingWelcomeLegal the design underlines.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Use'**
+  String get onboardingTermsOfUse;
+
+  /// Substring of onboardingWelcomeLegal the design underlines.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get onboardingPrivacyPolicy;
+
   /// No description provided for @onboardingIdentifyTitle.
   ///
   /// In en, this message translates to:
