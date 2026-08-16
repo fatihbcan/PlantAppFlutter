@@ -87,6 +87,16 @@ void main() {
     );
 
     blocTest<PaywallBloc, PaywallState>(
+      'records that an upsell entry does not end onboarding',
+      setUp: stubPlans,
+      build: build,
+      act: (PaywallBloc bloc) =>
+          bloc.add(const PaywallEvent.started(completesOnboarding: false)),
+      verify: (PaywallBloc bloc) =>
+          expect(bloc.state.completesOnboarding, isFalse),
+    );
+
+    blocTest<PaywallBloc, PaywallState>(
       'keeps a user selection across a retry',
       setUp: stubPlans,
       build: build,
@@ -130,6 +140,19 @@ void main() {
         const PaywallState(shouldExit: true),
       ],
       verify: (_) => verify(() => completeOnboarding()).called(1),
+    );
+
+    blocTest<PaywallBloc, PaywallState>(
+      'leaves onboarding alone when the screen is an upsell',
+      setUp: stubCompletionSuccess,
+      build: build,
+      seed: () => const PaywallState(completesOnboarding: false),
+      act: (PaywallBloc bloc) => bloc.add(const PaywallEvent.closePressed()),
+      expect: () => <PaywallState>[
+        const PaywallState(completesOnboarding: false, isSubmitting: true),
+        const PaywallState(completesOnboarding: false, shouldExit: true),
+      ],
+      verify: (_) => verifyNever(() => completeOnboarding()),
     );
 
     blocTest<PaywallBloc, PaywallState>(

@@ -15,7 +15,11 @@ import 'package:hubx_flutter_case/shared/widgets/app_loader.dart';
 /// Home layout: greeting, search, premium banner, article carousel and the
 /// categories grid, all inside one scroll view.
 class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+  const HomeView({required this.onPremiumTap, super.key});
+
+  /// Called when the premium banner is tapped. Navigation lives in the Page,
+  /// so the View stays a pure render of its Bloc state.
+  final VoidCallback onPremiumTap;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +39,9 @@ class HomeView extends StatelessWidget {
             // load leaves the page shorter than the viewport.
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: <Widget>[
-              SliverToBoxAdapter(child: _Header(l10n: l10n)),
+              SliverToBoxAdapter(
+                child: _Header(l10n: l10n, onPremiumTap: onPremiumTap),
+              ),
               if (state.showsQuestions)
                 SliverToBoxAdapter(child: _QuestionsSection(state: state)),
               if (state.showsQuestionsError)
@@ -65,9 +71,10 @@ class HomeView extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.l10n});
+  const _Header({required this.l10n, required this.onPremiumTap});
 
   final AppL10n l10n;
+  final VoidCallback onPremiumTap;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +98,7 @@ class _Header extends StatelessWidget {
           child: HomePremiumBanner(
             title: l10n.homePremiumBannerTitle,
             body: l10n.homePremiumBannerBody,
-            onTap: () {},
+            onTap: onPremiumTap,
           ),
         ),
         SizedBox(height: dimens.spaceXl),

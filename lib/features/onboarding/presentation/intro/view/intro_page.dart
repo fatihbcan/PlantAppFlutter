@@ -24,7 +24,7 @@ class IntroPage extends StatelessWidget {
             !previous.isFinished && current.isFinished,
         listener: (BuildContext context, IntroState state) {
           context.read<IntroBloc>().add(const IntroEvent.finishConsumed());
-          unawaited(context.router.push(const PaywallRoute()));
+          unawaited(context.router.push(PaywallRoute()));
         },
         child: Scaffold(
           backgroundColor: context.appColors.canvas,

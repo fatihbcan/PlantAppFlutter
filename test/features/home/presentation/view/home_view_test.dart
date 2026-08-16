@@ -7,6 +7,7 @@ import 'package:hubx_flutter_case/features/home/domain/entity/question.dart';
 import 'package:hubx_flutter_case/features/home/presentation/bloc/home_bloc.dart';
 import 'package:hubx_flutter_case/features/home/presentation/view/home_view.dart';
 import 'package:hubx_flutter_case/features/home/presentation/widgets/category_tile.dart';
+import 'package:hubx_flutter_case/features/home/presentation/widgets/home_premium_banner.dart';
 import 'package:hubx_flutter_case/features/home/presentation/widgets/question_card.dart';
 import 'package:hubx_flutter_case/shared/widgets/app_error_view.dart';
 import 'package:hubx_flutter_case/shared/widgets/app_loader.dart';
@@ -55,11 +56,15 @@ void main() {
     WidgetTester tester,
     HomeState state, {
     Size surfaceSize = tallSurface,
+    VoidCallback? onPremiumTap,
   }) async {
     whenListen(bloc, const Stream<HomeState>.empty(), initialState: state);
 
     await tester.pumpApp(
-      BlocProvider<HomeBloc>.value(value: bloc, child: const HomeView()),
+      BlocProvider<HomeBloc>.value(
+        value: bloc,
+        child: HomeView(onPremiumTap: onPremiumTap ?? () {}),
+      ),
       surfaceSize: surfaceSize,
     );
   }
@@ -232,6 +237,24 @@ void main() {
       expect(find.byType(CategoryTile), findsNothing);
       expect(find.text(tester.l10n.homeSearchEmpty('orchid')), findsOneWidget);
     });
+  });
+
+  testWidgets('tapping the premium banner reports the tap', (
+    WidgetTester tester,
+  ) async {
+    int taps = 0;
+
+    await pumpHome(
+      tester,
+      const HomeState(questions: questions, categories: categories),
+      onPremiumTap: () => taps++,
+    );
+
+    await tester.tap(find.byType(HomePremiumBanner));
+    await tester.pump();
+
+    // The View only reports it; HomePage is what pushes the paywall.
+    expect(taps, 1);
   });
 
   testWidgets('pull-to-refresh asks the Bloc to reload', (
