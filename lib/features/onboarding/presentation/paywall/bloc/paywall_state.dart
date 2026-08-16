@@ -9,8 +9,13 @@ abstract class PaywallState with _$PaywallState {
     @Default(false) bool isSubmitting,
     @Default(null) PaywallError? error,
 
-    /// Set once onboarding is recorded as complete and the flow should leave
-    /// for home. Cleared by [PaywallExitConsumed].
+    /// Whether leaving this screen also ends onboarding. Set from
+    /// [PaywallStarted]; false when the paywall is an upsell rather than the
+    /// last step of the flow.
+    @Default(true) bool completesOnboarding,
+
+    /// Set once the screen is done and the view should leave. Cleared by
+    /// [PaywallExitConsumed].
     @Default(false) bool shouldExit,
   }) = _PaywallState;
 

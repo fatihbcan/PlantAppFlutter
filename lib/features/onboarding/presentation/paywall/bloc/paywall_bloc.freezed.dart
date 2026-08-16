@@ -129,10 +129,10 @@ return exitConsumed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function( String planId)?  planSelected,TResult Function()?  subscribePressed,TResult Function()?  closePressed,TResult Function()?  exitConsumed,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( bool completesOnboarding)?  started,TResult Function( String planId)?  planSelected,TResult Function()?  subscribePressed,TResult Function()?  closePressed,TResult Function()?  exitConsumed,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case PaywallStarted() when started != null:
-return started();case PaywallPlanSelected() when planSelected != null:
+return started(_that.completesOnboarding);case PaywallPlanSelected() when planSelected != null:
 return planSelected(_that.planId);case PaywallSubscribePressed() when subscribePressed != null:
 return subscribePressed();case PaywallClosePressed() when closePressed != null:
 return closePressed();case PaywallExitConsumed() when exitConsumed != null:
@@ -154,10 +154,10 @@ return exitConsumed();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function( String planId)  planSelected,required TResult Function()  subscribePressed,required TResult Function()  closePressed,required TResult Function()  exitConsumed,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( bool completesOnboarding)  started,required TResult Function( String planId)  planSelected,required TResult Function()  subscribePressed,required TResult Function()  closePressed,required TResult Function()  exitConsumed,}) {final _that = this;
 switch (_that) {
 case PaywallStarted():
-return started();case PaywallPlanSelected():
+return started(_that.completesOnboarding);case PaywallPlanSelected():
 return planSelected(_that.planId);case PaywallSubscribePressed():
 return subscribePressed();case PaywallClosePressed():
 return closePressed();case PaywallExitConsumed():
@@ -175,10 +175,10 @@ return exitConsumed();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function( String planId)?  planSelected,TResult? Function()?  subscribePressed,TResult? Function()?  closePressed,TResult? Function()?  exitConsumed,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( bool completesOnboarding)?  started,TResult? Function( String planId)?  planSelected,TResult? Function()?  subscribePressed,TResult? Function()?  closePressed,TResult? Function()?  exitConsumed,}) {final _that = this;
 switch (_that) {
 case PaywallStarted() when started != null:
-return started();case PaywallPlanSelected() when planSelected != null:
+return started(_that.completesOnboarding);case PaywallPlanSelected() when planSelected != null:
 return planSelected(_that.planId);case PaywallSubscribePressed() when subscribePressed != null:
 return subscribePressed();case PaywallClosePressed() when closePressed != null:
 return closePressed();case PaywallExitConsumed() when exitConsumed != null:
@@ -194,33 +194,67 @@ return exitConsumed();case _:
 
 
 class PaywallStarted implements PaywallEvent {
-  const PaywallStarted();
+  const PaywallStarted({this.completesOnboarding = true});
   
 
+@JsonKey() final  bool completesOnboarding;
 
-
+/// Create a copy of PaywallEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PaywallStartedCopyWith<PaywallStarted> get copyWith => _$PaywallStartedCopyWithImpl<PaywallStarted>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaywallStarted);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaywallStarted&&(identical(other.completesOnboarding, completesOnboarding) || other.completesOnboarding == completesOnboarding));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,completesOnboarding);
 
 @override
 String toString() {
-  return 'PaywallEvent.started()';
+  return 'PaywallEvent.started(completesOnboarding: $completesOnboarding)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class $PaywallStartedCopyWith<$Res> implements $PaywallEventCopyWith<$Res> {
+  factory $PaywallStartedCopyWith(PaywallStarted value, $Res Function(PaywallStarted) _then) = _$PaywallStartedCopyWithImpl;
+@useResult
+$Res call({
+ bool completesOnboarding
+});
 
 
+
+
+}
+/// @nodoc
+class _$PaywallStartedCopyWithImpl<$Res>
+    implements $PaywallStartedCopyWith<$Res> {
+  _$PaywallStartedCopyWithImpl(this._self, this._then);
+
+  final PaywallStarted _self;
+  final $Res Function(PaywallStarted) _then;
+
+/// Create a copy of PaywallEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? completesOnboarding = null,}) {
+  return _then(PaywallStarted(
+completesOnboarding: null == completesOnboarding ? _self.completesOnboarding : completesOnboarding // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
 
 /// @nodoc
 
@@ -387,8 +421,11 @@ String toString() {
 /// @nodoc
 mixin _$PaywallState {
 
- bool get isLoading; List<SubscriptionPlan> get plans; String? get selectedPlanId; bool get isSubmitting; PaywallError? get error;/// Set once onboarding is recorded as complete and the flow should leave
-/// for home. Cleared by [PaywallExitConsumed].
+ bool get isLoading; List<SubscriptionPlan> get plans; String? get selectedPlanId; bool get isSubmitting; PaywallError? get error;/// Whether leaving this screen also ends onboarding. Set from
+/// [PaywallStarted]; false when the paywall is an upsell rather than the
+/// last step of the flow.
+ bool get completesOnboarding;/// Set once the screen is done and the view should leave. Cleared by
+/// [PaywallExitConsumed].
  bool get shouldExit;
 /// Create a copy of PaywallState
 /// with the given fields replaced by the non-null parameter values.
@@ -400,16 +437,16 @@ $PaywallStateCopyWith<PaywallState> get copyWith => _$PaywallStateCopyWithImpl<P
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaywallState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other.plans, plans)&&(identical(other.selectedPlanId, selectedPlanId) || other.selectedPlanId == selectedPlanId)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.error, error) || other.error == error)&&(identical(other.shouldExit, shouldExit) || other.shouldExit == shouldExit));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaywallState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other.plans, plans)&&(identical(other.selectedPlanId, selectedPlanId) || other.selectedPlanId == selectedPlanId)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.error, error) || other.error == error)&&(identical(other.completesOnboarding, completesOnboarding) || other.completesOnboarding == completesOnboarding)&&(identical(other.shouldExit, shouldExit) || other.shouldExit == shouldExit));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLoading,const DeepCollectionEquality().hash(plans),selectedPlanId,isSubmitting,error,shouldExit);
+int get hashCode => Object.hash(runtimeType,isLoading,const DeepCollectionEquality().hash(plans),selectedPlanId,isSubmitting,error,completesOnboarding,shouldExit);
 
 @override
 String toString() {
-  return 'PaywallState(isLoading: $isLoading, plans: $plans, selectedPlanId: $selectedPlanId, isSubmitting: $isSubmitting, error: $error, shouldExit: $shouldExit)';
+  return 'PaywallState(isLoading: $isLoading, plans: $plans, selectedPlanId: $selectedPlanId, isSubmitting: $isSubmitting, error: $error, completesOnboarding: $completesOnboarding, shouldExit: $shouldExit)';
 }
 
 
@@ -420,7 +457,7 @@ abstract mixin class $PaywallStateCopyWith<$Res>  {
   factory $PaywallStateCopyWith(PaywallState value, $Res Function(PaywallState) _then) = _$PaywallStateCopyWithImpl;
 @useResult
 $Res call({
- bool isLoading, List<SubscriptionPlan> plans, String? selectedPlanId, bool isSubmitting, PaywallError? error, bool shouldExit
+ bool isLoading, List<SubscriptionPlan> plans, String? selectedPlanId, bool isSubmitting, PaywallError? error, bool completesOnboarding, bool shouldExit
 });
 
 
@@ -437,14 +474,15 @@ class _$PaywallStateCopyWithImpl<$Res>
 
 /// Create a copy of PaywallState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isLoading = null,Object? plans = null,Object? selectedPlanId = freezed,Object? isSubmitting = null,Object? error = freezed,Object? shouldExit = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isLoading = null,Object? plans = null,Object? selectedPlanId = freezed,Object? isSubmitting = null,Object? error = freezed,Object? completesOnboarding = null,Object? shouldExit = null,}) {
   return _then(PaywallState(
 isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,plans: null == plans ? _self.plans : plans // ignore: cast_nullable_to_non_nullable
 as List<SubscriptionPlan>,selectedPlanId: freezed == selectedPlanId ? _self.selectedPlanId : selectedPlanId // ignore: cast_nullable_to_non_nullable
 as String?,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
 as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
-as PaywallError?,shouldExit: null == shouldExit ? _self.shouldExit : shouldExit // ignore: cast_nullable_to_non_nullable
+as PaywallError?,completesOnboarding: null == completesOnboarding ? _self.completesOnboarding : completesOnboarding // ignore: cast_nullable_to_non_nullable
+as bool,shouldExit: null == shouldExit ? _self.shouldExit : shouldExit // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -530,10 +568,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isLoading,  List<SubscriptionPlan> plans,  String? selectedPlanId,  bool isSubmitting,  PaywallError? error,  bool shouldExit)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isLoading,  List<SubscriptionPlan> plans,  String? selectedPlanId,  bool isSubmitting,  PaywallError? error,  bool completesOnboarding,  bool shouldExit)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PaywallState() when $default != null:
-return $default(_that.isLoading,_that.plans,_that.selectedPlanId,_that.isSubmitting,_that.error,_that.shouldExit);case _:
+return $default(_that.isLoading,_that.plans,_that.selectedPlanId,_that.isSubmitting,_that.error,_that.completesOnboarding,_that.shouldExit);case _:
   return orElse();
 
 }
@@ -551,10 +589,10 @@ return $default(_that.isLoading,_that.plans,_that.selectedPlanId,_that.isSubmitt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isLoading,  List<SubscriptionPlan> plans,  String? selectedPlanId,  bool isSubmitting,  PaywallError? error,  bool shouldExit)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isLoading,  List<SubscriptionPlan> plans,  String? selectedPlanId,  bool isSubmitting,  PaywallError? error,  bool completesOnboarding,  bool shouldExit)  $default,) {final _that = this;
 switch (_that) {
 case _PaywallState():
-return $default(_that.isLoading,_that.plans,_that.selectedPlanId,_that.isSubmitting,_that.error,_that.shouldExit);case _:
+return $default(_that.isLoading,_that.plans,_that.selectedPlanId,_that.isSubmitting,_that.error,_that.completesOnboarding,_that.shouldExit);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -571,10 +609,10 @@ return $default(_that.isLoading,_that.plans,_that.selectedPlanId,_that.isSubmitt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isLoading,  List<SubscriptionPlan> plans,  String? selectedPlanId,  bool isSubmitting,  PaywallError? error,  bool shouldExit)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isLoading,  List<SubscriptionPlan> plans,  String? selectedPlanId,  bool isSubmitting,  PaywallError? error,  bool completesOnboarding,  bool shouldExit)?  $default,) {final _that = this;
 switch (_that) {
 case _PaywallState() when $default != null:
-return $default(_that.isLoading,_that.plans,_that.selectedPlanId,_that.isSubmitting,_that.error,_that.shouldExit);case _:
+return $default(_that.isLoading,_that.plans,_that.selectedPlanId,_that.isSubmitting,_that.error,_that.completesOnboarding,_that.shouldExit);case _:
   return null;
 
 }
@@ -586,7 +624,7 @@ return $default(_that.isLoading,_that.plans,_that.selectedPlanId,_that.isSubmitt
 
 
 class _PaywallState extends PaywallState {
-  const _PaywallState({this.isLoading = false,  List<SubscriptionPlan> plans = const <SubscriptionPlan>[], this.selectedPlanId = null, this.isSubmitting = false, this.error = null, this.shouldExit = false}): _plans = plans,super._();
+  const _PaywallState({this.isLoading = false,  List<SubscriptionPlan> plans = const <SubscriptionPlan>[], this.selectedPlanId = null, this.isSubmitting = false, this.error = null, this.completesOnboarding = true, this.shouldExit = false}): _plans = plans,super._();
   
 
 @override@JsonKey() final  bool isLoading;
@@ -600,8 +638,12 @@ class _PaywallState extends PaywallState {
 @override@JsonKey() final  String? selectedPlanId;
 @override@JsonKey() final  bool isSubmitting;
 @override@JsonKey() final  PaywallError? error;
-/// Set once onboarding is recorded as complete and the flow should leave
-/// for home. Cleared by [PaywallExitConsumed].
+/// Whether leaving this screen also ends onboarding. Set from
+/// [PaywallStarted]; false when the paywall is an upsell rather than the
+/// last step of the flow.
+@override@JsonKey() final  bool completesOnboarding;
+/// Set once the screen is done and the view should leave. Cleared by
+/// [PaywallExitConsumed].
 @override@JsonKey() final  bool shouldExit;
 
 /// Create a copy of PaywallState
@@ -614,16 +656,16 @@ _$PaywallStateCopyWith<_PaywallState> get copyWith => __$PaywallStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaywallState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other._plans, _plans)&&(identical(other.selectedPlanId, selectedPlanId) || other.selectedPlanId == selectedPlanId)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.error, error) || other.error == error)&&(identical(other.shouldExit, shouldExit) || other.shouldExit == shouldExit));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaywallState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other._plans, _plans)&&(identical(other.selectedPlanId, selectedPlanId) || other.selectedPlanId == selectedPlanId)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.error, error) || other.error == error)&&(identical(other.completesOnboarding, completesOnboarding) || other.completesOnboarding == completesOnboarding)&&(identical(other.shouldExit, shouldExit) || other.shouldExit == shouldExit));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLoading,const DeepCollectionEquality().hash(_plans),selectedPlanId,isSubmitting,error,shouldExit);
+int get hashCode => Object.hash(runtimeType,isLoading,const DeepCollectionEquality().hash(_plans),selectedPlanId,isSubmitting,error,completesOnboarding,shouldExit);
 
 @override
 String toString() {
-  return 'PaywallState(isLoading: $isLoading, plans: $plans, selectedPlanId: $selectedPlanId, isSubmitting: $isSubmitting, error: $error, shouldExit: $shouldExit)';
+  return 'PaywallState(isLoading: $isLoading, plans: $plans, selectedPlanId: $selectedPlanId, isSubmitting: $isSubmitting, error: $error, completesOnboarding: $completesOnboarding, shouldExit: $shouldExit)';
 }
 
 
@@ -634,7 +676,7 @@ abstract mixin class _$PaywallStateCopyWith<$Res> implements $PaywallStateCopyWi
   factory _$PaywallStateCopyWith(_PaywallState value, $Res Function(_PaywallState) _then) = __$PaywallStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool isLoading, List<SubscriptionPlan> plans, String? selectedPlanId, bool isSubmitting, PaywallError? error, bool shouldExit
+ bool isLoading, List<SubscriptionPlan> plans, String? selectedPlanId, bool isSubmitting, PaywallError? error, bool completesOnboarding, bool shouldExit
 });
 
 
@@ -651,14 +693,15 @@ class __$PaywallStateCopyWithImpl<$Res>
 
 /// Create a copy of PaywallState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isLoading = null,Object? plans = null,Object? selectedPlanId = freezed,Object? isSubmitting = null,Object? error = freezed,Object? shouldExit = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isLoading = null,Object? plans = null,Object? selectedPlanId = freezed,Object? isSubmitting = null,Object? error = freezed,Object? completesOnboarding = null,Object? shouldExit = null,}) {
   return _then(_PaywallState(
 isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,plans: null == plans ? _self._plans : plans // ignore: cast_nullable_to_non_nullable
 as List<SubscriptionPlan>,selectedPlanId: freezed == selectedPlanId ? _self.selectedPlanId : selectedPlanId // ignore: cast_nullable_to_non_nullable
 as String?,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
 as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
-as PaywallError?,shouldExit: null == shouldExit ? _self.shouldExit : shouldExit // ignore: cast_nullable_to_non_nullable
+as PaywallError?,completesOnboarding: null == completesOnboarding ? _self.completesOnboarding : completesOnboarding // ignore: cast_nullable_to_non_nullable
+as bool,shouldExit: null == shouldExit ? _self.shouldExit : shouldExit // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

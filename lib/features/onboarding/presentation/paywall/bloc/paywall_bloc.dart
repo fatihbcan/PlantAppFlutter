@@ -15,7 +15,9 @@ part 'paywall_state.dart';
 /// actually ends onboarding.
 ///
 /// Both the close button and a completed "purchase" record completion, so a
-/// user who subscribes is not sent back through onboarding either.
+/// user who subscribes is not sent back through onboarding either. Reopened
+/// later as an upsell (`completesOnboarding: false`) it skips that write and
+/// only reports that the screen is done.
 @injectable
 class PaywallBloc extends Bloc<PaywallEvent, PaywallState> {
   PaywallBloc(this._getPlans, this._completeOnboarding)
@@ -34,7 +36,13 @@ class PaywallBloc extends Bloc<PaywallEvent, PaywallState> {
     PaywallStarted event,
     Emitter<PaywallState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true, error: null));
+    emit(
+      state.copyWith(
+        isLoading: true,
+        error: null,
+        completesOnboarding: event.completesOnboarding,
+      ),
+    );
 
     final GetPlansResult result = await _getPlans();
 
@@ -90,6 +98,13 @@ class PaywallBloc extends Bloc<PaywallEvent, PaywallState> {
   }
 
   Future<void> _finishOnboarding(Emitter<PaywallState> emit) async {
+    // Shown as an upsell, the screen has no onboarding to record — the flag
+    // was already written the first time through the flow.
+    if (!state.completesOnboarding) {
+      emit(state.copyWith(isSubmitting: false, shouldExit: true));
+      return;
+    }
+
     final CompleteOnboardingResult result = await _completeOnboarding();
 
     switch (result) {
