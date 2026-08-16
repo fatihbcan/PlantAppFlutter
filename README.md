@@ -167,11 +167,12 @@ are marked disabled for a screen reader rather than posing as buttons that
 silently do nothing; Home is marked current, and the raised scan control is
 the bar's one live affordance. A widget test holds all three claims.
 
-**Home content taps.** The premium strip, the article cards and the category
-tiles carry an `onTap` that is still empty — the case defines no destination
-for any of them. Unlike the tab bar, they are not marked disabled, so they
-ripple and do nothing. `Question.articleUrl` is fetched and mapped ready for
-the article cards to open it.
+**Home content taps.** The article cards and the category tiles carry an
+`onTap` that is still empty — the case defines no destination for either.
+Unlike the tab bar, they are not marked disabled, so they ripple and do
+nothing. `Question.articleUrl` is fetched and mapped ready for the article
+cards to open it. The premium strip does navigate: it pushes the paywall over
+home, so closing it pops back with home's state intact.
 
 ## Testing
 
