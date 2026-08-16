@@ -20,7 +20,7 @@ before the first build, and again after any change to an annotated class.
 ```bash
 flutter analyze                # zero issues expected
 dart format --set-exit-if-changed lib test
-flutter test                   # 161 tests
+flutter test                   # 164 tests
 ```
 
 ## What the app does
@@ -176,7 +176,7 @@ home, so closing it pops back with home's state intact.
 
 ## Testing
 
-161 tests. Unit and Bloc level: DTO→entity mappers (null collapsing,
+164 tests. Unit and Bloc level: DTO→entity mappers (null collapsing,
 rank/order sorting), repository impls (one test per result branch), use
 cases, `bloc_test` suites for `HomeBloc`, `PaywallBloc` and `IntroBloc`
 including concurrency behaviour, State getters, and the two interceptors'
