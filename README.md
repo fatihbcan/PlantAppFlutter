@@ -152,21 +152,25 @@ holds a string literal. Figma serves these capped at about 512px on the
 longest edge — enough for 1x and 2x at the sizes they are drawn, slightly
 soft for the largest of them on a 3x screen.
 
-Two pieces are drawn rather than exported. The three care badges on the
-welcome screen are violet, amber and azure in the frames but green in the
-export, so they are built from `AppColors` and a Material icon, which also
-keeps them crisp at any density. The paywall's feature icons are Material
-icons for the same reason.
+One piece is drawn rather than exported: the viewfinder in
+`shared/widgets/scan_frame.dart`, because the design stretches the same mark
+to a different aspect on each screen. Everything else — including the three
+care badges on the welcome screen and the paywall's three feature tiles — is
+the design file's own export, vendored under `assets/images` and
+`assets/icons`.
 
 ## Known gaps
-
-**Fonts.** The app uses the platform default (SF Pro on iOS, Roboto on
-Android) rather than bundling the design's typeface.
 
 **Tab bar.** The home design's five destinations are all present, but only
 Home has a screen in this case. The other four render and are marked
 disabled for a screen reader rather than posing as buttons that silently do
 nothing; the raised scan control is the bar's one live affordance.
+
+**Home content taps.** The premium strip, the article cards and the category
+tiles carry an `onTap` that is still empty — the case defines no destination
+for any of them. Unlike the tab bar, they are not marked disabled, so they
+ripple and do nothing. `Question.articleUrl` is fetched and mapped ready for
+the article cards to open it.
 
 **Widget tests.** The suite is unit and Bloc level. The case lists widget
 tests under its bonus criteria and there are none yet.
