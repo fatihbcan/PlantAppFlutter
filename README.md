@@ -20,7 +20,7 @@ before the first build, and again after any change to an annotated class.
 ```bash
 flutter analyze                # zero issues expected
 dart format --set-exit-if-changed lib test
-flutter test                   # 113 tests
+flutter test                   # 161 tests
 ```
 
 ## What the app does
@@ -162,9 +162,10 @@ the design file's own export, vendored under `assets/images` and
 ## Known gaps
 
 **Tab bar.** The home design's five destinations are all present, but only
-Home has a screen in this case. The other four render and are marked
-disabled for a screen reader rather than posing as buttons that silently do
-nothing; the raised scan control is the bar's one live affordance.
+Home has a screen in this case. Diagnose, My Garden and Profile render and
+are marked disabled for a screen reader rather than posing as buttons that
+silently do nothing; Home is marked current, and the raised scan control is
+the bar's one live affordance. A widget test holds all three claims.
 
 **Home content taps.** The premium strip, the article cards and the category
 tiles carry an `onTap` that is still empty — the case defines no destination
@@ -172,12 +173,27 @@ for any of them. Unlike the tab bar, they are not marked disabled, so they
 ripple and do nothing. `Question.articleUrl` is fetched and mapped ready for
 the article cards to open it.
 
-**Widget tests.** The suite is unit and Bloc level. The case lists widget
-tests under its bonus criteria and there are none yet.
-
 ## Testing
 
-113 tests: DTO→entity mappers (null collapsing, rank/order sorting),
-repository impls (one test per result branch), use cases, `bloc_test` suites
-for `HomeBloc`, `PaywallBloc` and `IntroBloc` including concurrency
-behaviour, State getters, and the two interceptors' translation rules.
+161 tests. Unit and Bloc level: DTO→entity mappers (null collapsing,
+rank/order sorting), repository impls (one test per result branch), use
+cases, `bloc_test` suites for `HomeBloc`, `PaywallBloc` and `IntroBloc`
+including concurrency behaviour, State getters, and the two interceptors'
+translation rules.
+
+Widget level: each screen's `*View`, pumped over a mocked Bloc through
+`test/helpers/pump_app.dart`, which supplies the theme extensions, the
+localisations and a configurable viewport. `HomeView` covers the loader, the
+loaded grid and carousel, each failure path separately — a dead
+`getCategories` still leaves the carousel usable — search, and
+pull-to-refresh. `IntroView` covers the per-page copy, artwork and dots, and
+both ways of advancing. `PaywallView` covers the plan tiles, selection, the
+close control and the CTA's disabled states. Below that, the shared widgets
+and `HomeBottomBar`, whose test asserts through the semantics tree that the
+dead destinations are announced as disabled.
+
+Two things are deliberately not covered. Navigation: it lives in the `*Page`
+route entries, which need DI and a router, and the state transitions that
+trigger it are already asserted in the Bloc suites. And goldens: they would
+pin down rendering that varies by machine without defending anything the
+design work does not already state.
